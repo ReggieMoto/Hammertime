@@ -43,6 +43,34 @@ namespace Hammertime
             // Base class: Attach to the DB server
             // Base class: Build a roster from the server
             Console.WriteLine("Initializing the home team.");
+            buildTeamRoster();
         }
+
+        public void printHomeTeamRoster()
+        {
+            printTeamRoster(_homeRoster);
+        }
+
+        protected override void buildTeamRoster()
+        {
+            List<HockeyPlayer> roster = new List<HockeyPlayer>();
+
+            // Build a home team roster
+            Console.WriteLine("Building the home team roster.");
+            // The home team is the "white" team
+            // Look to see which which full-time players were on the visiting "black" team last week and make them the home "white" team this week
+            foreach (HockeyPlayer player in _masterRoster)
+            {
+                if ((player.PlayerType == 'F') &&       // Full-time player
+                    (player.PlayerLastWeek == "Black")) // Last week player was on the visiting "black" team
+                {
+                    roster.Add(player); // This week the player will be on the home "white" team
+                }
+            }
+
+            _homeRoster = roster.ToArray();
+        }
+
+        private HockeyPlayer[] _homeRoster;
     }
 }

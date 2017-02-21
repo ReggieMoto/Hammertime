@@ -93,8 +93,8 @@ namespace Hammertime
                 HomeTeam white = HomeTeam.Instance;
                 VisitorTeam dark = VisitorTeam.Instance;
 
-                white.printRoster();
-                dark.printRoster();
+                white.printHomeTeamRoster();
+                dark.printVisitingTeamRoster();
             }
         }
     }

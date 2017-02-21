@@ -37,11 +37,11 @@ namespace Hammertime
             // Establish home/away (white/dark)
             Location = residence;
 
-           // Build the roster
-            buildRoster();
+           // Build the master roster
+            buildMasterRoster();
         }
 
-        public void printRoster()
+        protected void printTeamRoster(HockeyPlayer[] teamRoster)
         {
             string formatString = "{0,30} |{1,7} |{2,10} |{3,15}";
             Console.WriteLine("==========================================================================");
@@ -51,7 +51,7 @@ namespace Hammertime
             int score = 0;
             string level;
 
-            foreach (HockeyPlayer player in _roster)
+            foreach (HockeyPlayer player in teamRoster)
             {
                 switch (player.Level)
                 {
@@ -84,26 +84,36 @@ namespace Hammertime
         }
 
         public Residence Location { get; set; }
+        protected int MasterRosterPlayerCount { get; set; }
+        private static bool MasterRosterInitialized { get; set; }
 
         // Private
         private HockeyTeam() {; }
         private HockeyTeam(HockeyTeam team) // Copy constructor
         {
-            _roster = team._roster;
             Location = team.Location;
+            MasterRosterPlayerCount = team.MasterRosterPlayerCount;
         }
 
-        private void buildRoster()
+        protected abstract void buildTeamRoster();
+
+        private void buildMasterRoster()
         {
+            if (MasterRosterInitialized == true)
+                return;
+
+            MasterRosterInitialized = true;
+            Console.WriteLine("Building the master roster.");
+
             // Build a roster from the server based on residence (home/away)
             DbConnection myDbConnection = DbConnection.getInstance();
 
-            int numberOfRecords = myDbConnection.Count();       // Number of records
+            MasterRosterPlayerCount = myDbConnection.Count();       // Number of records
 
-            _roster = new HockeyPlayer[numberOfRecords];        // Number of Hockey Players
+            _masterRoster = new HockeyPlayer[MasterRosterPlayerCount];        // Number of Hockey Players
             List<string>[] dbRecords = myDbConnection.Select(); // Read the records out of the DB
 
-            for (int index=0; index<numberOfRecords; index++)          
+            for (int index=0; index < MasterRosterPlayerCount; index++)          
             {
                 int playerID;
                 int.TryParse(dbRecords[0][index], out playerID);
@@ -120,7 +130,7 @@ namespace Hammertime
                 else // (level == 'A')
                     skillLevel = HockeyPlayer.PlayerSkill.Level_A;
 
-                _roster[index] = new Hammertime.HockeyPlayer(
+                _masterRoster[index] = new Hammertime.HockeyPlayer(
                     playerID,
                     dbRecords[1][index],    // Last Name
                     dbRecords[2][index],    // First Name
@@ -133,6 +143,6 @@ namespace Hammertime
             }
         }
 
-        private HockeyPlayer[] _roster;
+        protected static HockeyPlayer[] _masterRoster;
     }
 }

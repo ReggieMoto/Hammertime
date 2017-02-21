@@ -77,8 +77,7 @@ namespace Hammertime
         public string PlayerTeam { get; set; }      // Ben, Barry, Unaffiliated
         public string PlayerLastWeek { get; set; }  // White, Black, Zed (Didn't play)
 
-        // Private
-        private HockeyPlayer(HockeyPlayer player)
+        public  HockeyPlayer(HockeyPlayer player)
         {
             LastName = player.LastName;
             PlayerID = player.PlayerID;
