@@ -8,7 +8,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Hammertime.HockeyPlayer">
-    <Position X="6.5" Y="0.5" Width="2.25" />
+    <Position X="9.25" Y="0.5" Width="2.25" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
@@ -30,7 +30,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Hammertime.HockeyTeam">
-    <Position X="3.25" Y="1" Width="2.5" />
+    <Position X="4.25" Y="0.5" Width="2.5" />
     <NestedTypes>
       <Enum Name="Hammertime.HockeyTeam.Residence" Collapsed="true">
         <TypeIdentifier>
@@ -39,26 +39,26 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAQAAAAAAAAAAAAIAAIAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <HashCode>EQAAAAAAAAAAIAAAIAIAAAAAAAAAAIAAAAAAAAAAACA=</HashCode>
       <FileName>HockeyTeam.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hammertime.HomeTeam">
-    <Position X="1.75" Y="5.25" Width="1.5" />
+    <Position X="2" Y="3.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAACAAAAAAAAAAAACAAAAAAAQAAAAAAEACA=</HashCode>
       <FileName>HomeTeam.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hammertime.VisitorTeam">
-    <Position X="5.75" Y="5.25" Width="1.5" />
+    <Position X="7" Y="3.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAQAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAACAAACAAAAAAAAAAAAAAAAAAAEAQAAAAAAAACA=</HashCode>
       <FileName>VisitorTeam.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hammertime.DbConnection">
-    <Position X="9.5" Y="0.5" Width="1.5" />
+    <Position X="12" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AgQAAEAAAAAAQAAAQAACgBQAhQGAAAQIAAAAQAAABAA=</HashCode>
       <FileName>DbConnection.cs</FileName>

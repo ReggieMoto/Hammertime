@@ -17,12 +17,7 @@
 // ==============================================================
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Data.Linq;
-using System.Data.Linq.Mapping;
 
 namespace Hammertime
 {
@@ -91,9 +86,9 @@ namespace Hammertime
             if (dbConnection.Connected)
             {
                 HomeTeam white = HomeTeam.Instance;
-                VisitorTeam dark = VisitorTeam.Instance;
-
                 white.printHomeTeamRoster();
+
+                VisitorTeam dark = VisitorTeam.Instance;
                 dark.printVisitingTeamRoster();
             }
         }

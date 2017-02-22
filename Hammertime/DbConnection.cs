@@ -17,10 +17,7 @@
 // ==============================================================
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-//Add MySql Library
+using System.Collections;
 using MySql.Data.MySqlClient;
 
 namespace Hammertime
@@ -53,18 +50,18 @@ namespace Hammertime
         //Constructor
         private DbConnection()
         {
+            _connection = new MySqlConnection(_connectionString);
+
             try
             {
-                //Console.WriteLine("Logging in to MySqlConnection.");
-                _connection = new MySqlConnection(_connectionString);
-                _connected = true;
-                //Console.WriteLine($"Connected to {_server}:{_database} as {_uid}.");
+                _connected = OpenConnection();
+                if (Connected)
+                    CloseConnection();
             }
             catch (MySqlException ex)
             {
                 ParseException(ex);
                 _connected = false;
-                //Console.WriteLine($"Connection to {_server}:{_database} failed.");
             }
         }
 
@@ -123,67 +120,51 @@ namespace Hammertime
         {
         }
 
-        //Select statement
-        public List<string>[] Select()
+        // Select Statement
+        public ArrayList Select()
         {
-            // To execute a Select statement, we add a few more steps, and we use the ExecuteReader method that will return a dataReader object to read and store the data or records.
+            ArrayList playerList = new ArrayList();
 
-            // Open connection to the database.
-            // Create a MySQL command.
-            // Assign a connection and a query to the command.This can be done using the constructor, or using the Connection and the CommandText methods in the MySqlCommand class.
-            // Create a MySqlDataReader object to read the selected records/data.
-            // Execute the command.
-            // Read the records and display them or store them in a list.
-            // Close the data reader.
-            // Close the connection.
-
-            string query = "SELECT * FROM players";
-
-            //Create a list to store the result
-            List<string>[] list = new List<string>[8];
-            list[0] = new List<string>();   // List of player IDs
-            list[1] = new List<string>();   // List of player last names
-            list[2] = new List<string>();   // List of player first names
-            list[3] = new List<string>();   // List of player levels (A, B, C, D)
-            list[4] = new List<string>();   // List of player positions
-            list[5] = new List<string>();   // List of player types (F/S)
-            list[6] = new List<string>();   // List of player teams (Barry, Ben, Unaffiliated)
-            list[7] = new List<string>();   // List of player team assignments for last week
-
-            //Open connection
             if (OpenConnection() == true)
             {
+                var query = "SELECT * FROM players ORDER BY player_level";
+
                 //Create Command
                 MySqlCommand cmd = new MySqlCommand(query, _connection);
                 //Create a data reader and Execute the command
                 MySqlDataReader dataReader = cmd.ExecuteReader();
 
-                //Read the data and store them in the list
                 while (dataReader.Read())
                 {
-                    list[0].Add(dataReader["player_id"] + "");
-                    list[1].Add(dataReader["player_last_name"] + "");
-                    list[2].Add(dataReader["player_first_name"] + "");
-                    list[3].Add(dataReader["player_level"] + "");
-                    list[4].Add(dataReader["player_position"] + "");
-                    list[5].Add(dataReader["player_type"] + "");
-                    list[6].Add(dataReader["player_team"] + "");
-                    list[7].Add(dataReader["player_last_wk"] + "");
+                    var index     = dataReader["player_id"] + "";
+                    var lastName  = dataReader["player_last_name"] + "";
+                    var firstName = dataReader["player_first_name"] + "";
+                    var level     = dataReader["player_level"] + "";
+                    var position  = dataReader["player_position"] + "";
+                    var type      = dataReader["player_type"] + "";
+                    var team      = dataReader["player_team"] + "";
+                    var lastWeek  = dataReader["player_last_wk"] + "";
+
+                    int playerId;
+                    int.TryParse(index, out playerId);
+
+                    HockeyPlayer.PlayerSkill skillLevel;
+                    if (level == "D")
+                        skillLevel = HockeyPlayer.PlayerSkill.Level_D;
+                    else if (level == "C")
+                        skillLevel = HockeyPlayer.PlayerSkill.Level_C;
+                    else if (level == "B")
+                        skillLevel = HockeyPlayer.PlayerSkill.Level_B;
+                    else // (level == "A")
+                        skillLevel = HockeyPlayer.PlayerSkill.Level_A;
+
+                    playerList.Add(new HockeyPlayer(playerId, lastName, firstName, skillLevel, position, type[0], team, lastWeek));
                 }
 
-                //close Data Reader
-                dataReader.Close();
-
-                //close Connection
                 CloseConnection();
+            }
 
-                //return list to be displayed
-                return list;
-            }
-            else
-            {
-                return list;
-            }
+            return playerList;
         }
 
         //Count statement

@@ -17,9 +17,8 @@
 // ==============================================================
 
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
-using System.Text;
 
 namespace Hammertime
 {
@@ -41,17 +40,33 @@ namespace Hammertime
             buildMasterRoster();
         }
 
-        protected void printTeamRoster(HockeyPlayer[] teamRoster)
+        protected void printTeamRoster(ArrayList teamRoster)
         {
-            string formatString = "{0,30} |{1,7} |{2,10} |{3,15}";
+            string formatString = "{0,22}{1,10} |{2,7} |{3,10} |{4,15}";
+            string teamId;
+
+            if (Location == Residence.Home)
+            {
+                teamId = "Home Team (White)";
+            }
+            else
+            {
+                teamId = "Visiting Team (Dark)";
+
+            }
+
             Console.WriteLine("==========================================================================");
-            Console.WriteLine(formatString, "Player", "Level", "Position", "Team");
+            Console.WriteLine(formatString, teamId, "Player", "Level", "Position", "Team");
             Console.WriteLine("==========================================================================");
 
             int score = 0;
             string level;
+            formatString = "{0,32} |{1,7} |{2,10} |{3,15}";
 
-            foreach (HockeyPlayer player in teamRoster)
+            var query = from HockeyPlayer player in teamRoster
+                        select player;
+
+            foreach (HockeyPlayer player in query)
             {
                 switch (player.Level)
                 {
@@ -84,7 +99,6 @@ namespace Hammertime
         }
 
         public Residence Location { get; set; }
-        protected int MasterRosterPlayerCount { get; set; }
         private static bool MasterRosterInitialized { get; set; }
 
         // Private
@@ -92,57 +106,24 @@ namespace Hammertime
         private HockeyTeam(HockeyTeam team) // Copy constructor
         {
             Location = team.Location;
-            MasterRosterPlayerCount = team.MasterRosterPlayerCount;
         }
 
+        // Abstract method to build team roster based on residence (home/away)
         protected abstract void buildTeamRoster();
 
         private void buildMasterRoster()
         {
-            if (MasterRosterInitialized == true)
-                return;
-
-            MasterRosterInitialized = true;
-            Console.WriteLine("Building the master roster.");
-
-            // Build a roster from the server based on residence (home/away)
-            DbConnection myDbConnection = DbConnection.getInstance();
-
-            MasterRosterPlayerCount = myDbConnection.Count();       // Number of records
-
-            _masterRoster = new HockeyPlayer[MasterRosterPlayerCount];        // Number of Hockey Players
-            List<string>[] dbRecords = myDbConnection.Select(); // Read the records out of the DB
-
-            for (int index=0; index < MasterRosterPlayerCount; index++)          
+            if (MasterRosterInitialized == false)
             {
-                int playerID;
-                int.TryParse(dbRecords[0][index], out playerID);
+                Console.WriteLine("Retrieving the master roster.");
 
-                char level = dbRecords[3][index][0];
-                HockeyPlayer.PlayerSkill skillLevel;
+                DbConnection myDbConnection = DbConnection.getInstance();
+                _masterRoster = myDbConnection.Select();            // Read the records out of the DB
 
-                if (level == 'D')
-                    skillLevel = HockeyPlayer.PlayerSkill.Level_D;
-                else if (level == 'C')
-                    skillLevel = HockeyPlayer.PlayerSkill.Level_C;
-                else if (level == 'B')
-                    skillLevel = HockeyPlayer.PlayerSkill.Level_B;
-                else // (level == 'A')
-                    skillLevel = HockeyPlayer.PlayerSkill.Level_A;
-
-                _masterRoster[index] = new Hammertime.HockeyPlayer(
-                    playerID,
-                    dbRecords[1][index],    // Last Name
-                    dbRecords[2][index],    // First Name
-                    skillLevel,             // Level
-                    dbRecords[4][index],    // Position
-                    dbRecords[5][index][0], // Type
-                    dbRecords[6][index],    // Team
-                    dbRecords[7][index]     // Last week's team
-                    );
+                MasterRosterInitialized = true;
             }
         }
 
-        protected static HockeyPlayer[] _masterRoster;
+        protected static ArrayList _masterRoster;
     }
 }

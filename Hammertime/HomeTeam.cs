@@ -17,9 +17,7 @@
 // ==============================================================
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Collections;
 
 namespace Hammertime
 {
@@ -53,24 +51,23 @@ namespace Hammertime
 
         protected override void buildTeamRoster()
         {
-            List<HockeyPlayer> roster = new List<HockeyPlayer>();
-
-            // Build a home team roster
             Console.WriteLine("Building the home team roster.");
+
+            _homeRoster = new ArrayList();
+
             // The home team is the "white" team
             // Look to see which which full-time players were on the visiting "black" team last week and make them the home "white" team this week
+
             foreach (HockeyPlayer player in _masterRoster)
             {
                 if ((player.PlayerType == 'F') &&       // Full-time player
                     (player.PlayerLastWeek == "Black")) // Last week player was on the visiting "black" team
                 {
-                    roster.Add(player); // This week the player will be on the home "white" team
+                    _homeRoster.Add(player); // This week the player will be on the home "white" team
                 }
             }
-
-            _homeRoster = roster.ToArray();
         }
 
-        private HockeyPlayer[] _homeRoster;
+        private ArrayList _homeRoster;
     }
 }
