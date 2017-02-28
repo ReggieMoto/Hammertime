@@ -39,7 +39,7 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>EQAAAAAAAAAAIAAAIAIAAAAAAAAAAIAAAAAAAAAAACA=</HashCode>
+      <HashCode>EQAAAAAAAAAAIAAAAAIAAAAAAAAAAIAAAAAAAAAAACA=</HashCode>
       <FileName>HockeyTeam.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -62,6 +62,13 @@
     <TypeIdentifier>
       <HashCode>AgQAAEAAAAAAQAAAQAACgBQAhQGAAAQIAAAAQAAABAA=</HashCode>
       <FileName>DbConnection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hammertime.TeamopolisReader">
+    <Position X="7.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQEAIAAAAAAQAAAAAAEAA=</HashCode>
+      <FileName>TeamopolisReader.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />

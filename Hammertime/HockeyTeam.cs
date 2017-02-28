@@ -37,10 +37,10 @@ namespace Hammertime
             Location = residence;
 
            // Build the master roster
-            buildMasterRoster();
+            BuildMasterRoster();
         }
 
-        protected void printTeamRoster(ArrayList teamRoster)
+        protected void PrintTeamRoster(ArrayList teamRoster)
         {
             string formatString = "{0,22}{1,10} |{2,7} |{3,10} |{4,15}";
             string teamId;
@@ -109,9 +109,9 @@ namespace Hammertime
         }
 
         // Abstract method to build team roster based on residence (home/away)
-        protected abstract void buildTeamRoster();
+        protected abstract void BuildTeamRoster();
 
-        private void buildMasterRoster()
+        private void BuildMasterRoster()
         {
             if (MasterRosterInitialized == false)
             {

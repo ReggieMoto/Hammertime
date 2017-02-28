@@ -23,7 +23,7 @@ namespace Hammertime
 {
     class HammerMain
     {
-        static void getCredentials(out string uid, out string password)
+        static void GetCredentials(out string uid, out string password)
         {
             ConsoleKeyInfo cki;
             StringBuilder sb = new StringBuilder();
@@ -78,7 +78,12 @@ namespace Hammertime
             string password = null;
 
             // Get user credentials
-            getCredentials(out uid, out password);
+            GetCredentials(out uid, out password);
+
+            // Get the Teamopolis survey URL
+            // Located here for now. Move this to the HockeyTeam.cs BuildMasterRoster method.
+            TeamopolisReader reader = new TeamopolisReader();
+            reader.TeamopolisSurveyResults();
 
             // Log in to server
             DbConnection dbConnection = DbConnection.getInstance(server, database, uid, password);
@@ -86,10 +91,10 @@ namespace Hammertime
             if (dbConnection.Connected)
             {
                 HomeTeam white = HomeTeam.Instance;
-                white.printHomeTeamRoster();
+                white.PrintHomeTeamRoster();
 
                 VisitorTeam dark = VisitorTeam.Instance;
-                dark.printVisitingTeamRoster();
+                dark.PrintVisitingTeamRoster();
             }
         }
     }

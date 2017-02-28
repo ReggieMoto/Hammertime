@@ -51,6 +51,7 @@
     <Compile Include="HomeTeam.cs" />
     <Compile Include="DbConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TeamopolisReader.cs" />
     <Compile Include="VisitorTeam.cs" />
   </ItemGroup>
   <ItemGroup>

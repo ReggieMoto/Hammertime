@@ -41,15 +41,15 @@ namespace Hammertime
             // Base class: Attach to the DB server
             // Base class: Build a roster from the server
             Console.WriteLine("Initializing the visiting team.");
-            buildTeamRoster();
+            BuildTeamRoster();
         }
 
-        public void printVisitingTeamRoster()
+        public void PrintVisitingTeamRoster()
         {
-            printTeamRoster(_visitorRoster);
+            PrintTeamRoster(_visitorRoster);
         }
 
-        protected override void buildTeamRoster()
+        protected override void BuildTeamRoster()
         {
             Console.WriteLine("Building the visiting team roster.");
 
