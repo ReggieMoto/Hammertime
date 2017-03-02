@@ -61,6 +61,7 @@ namespace Hammertime
             PlayerType = player_type;
             PlayerTeam = player_team;
             PlayerLastWeek = player_last_wk;
+            AssignedToTeam = false;
         }
 
         public int PlayerID { get; set; }
@@ -71,6 +72,7 @@ namespace Hammertime
         public char PlayerType { get; set; }        // Full time, Sub
         public string PlayerTeam { get; set; }      // Ben, Barry, Unaffiliated
         public string PlayerLastWeek { get; set; }  // White, Black, Zed (Didn't play)
+        public bool AssignedToTeam { get; set; }    // Is the player assigned to a team yet
 
         public  HockeyPlayer(HockeyPlayer player)
         {
@@ -82,6 +84,7 @@ namespace Hammertime
             PlayerType = player.PlayerType;
             PlayerTeam = player.PlayerTeam;
             PlayerLastWeek = player.PlayerLastWeek;
+            AssignedToTeam = player.AssignedToTeam;
         }
     }
 }

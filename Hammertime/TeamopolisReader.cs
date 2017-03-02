@@ -9,14 +9,34 @@ namespace Hammertime
 {
     public class TeamopolisReader
     {
+        public static TeamopolisReader Instance
+        {
+            get
+            {
+                if (_teamopolisReader == null)
+                    _teamopolisReader = new TeamopolisReader();
+                return _teamopolisReader;
+            }
+        }
+
+        private static TeamopolisReader _teamopolisReader;  // Reader instance
+        private ArrayList _teamopolisAvalablePlayers;       // Available survey responders
         private string _teamopolisUrl;
         private string _teamopolisSurveyUrl;
 
+
+        public ArrayList AvailablePlayers
+        {
+                get { return _teamopolisAvalablePlayers; }
+        }
+
         // =====================================================
-        public TeamopolisReader(string url = "http://madhockeynh.teamopolis.com")
+        private TeamopolisReader(string url = "http://madhockeynh.teamopolis.com")
         // =====================================================
         {
             _teamopolisUrl = url;
+            _teamopolisAvalablePlayers = new ArrayList();
+            TeamopolisSurveyResults();
         }
 
         // =====================================================
@@ -60,6 +80,7 @@ namespace Hammertime
                                 int first = pageLine.IndexOf(firstSubStringPattern) + firstSubStringPattern.Length;
                                 int last = pageLine.Length - lastSubStringPattern.Length;
                                 responderName = pageLine.Substring(first, last - first);
+                                _teamopolisAvalablePlayers.Add(responderName);
                             }
                         }
                         catch (IOException ex)
@@ -122,10 +143,10 @@ namespace Hammertime
         //  those player URLs and skip the rest.
         //
         //  The lists are arranged like this:
-        //  1. (Full-Time Players) I'm In for this Monday!
-        //  2. (Full-Time Players) Sorry Boy's I'm Out!
-        //  3. (I am a Sub) I'm Available! Call me if you need me!
-        //  4. Others we aren't interested in.
+        //  0. (Full-Time Players) I'm In for this Monday!
+        //  1. (Full-Time Players) Sorry Boy's I'm Out!
+        //  2. (I am a Sub) I'm Available! Call me if you need me!
+        //  3. Others we aren't interested in.
         //
         //  So, gather responders from lists 1 and 3.
         // =====================================================
@@ -133,9 +154,16 @@ namespace Hammertime
         // =====================================================
         {
             var webClient = new WebClient();
+            string[] responderTypePatterns =
+            {
+                "(I'm In)",         // (Full-Time Players) I'm In for this Monday!
+                "(I'm Out)",        // (Full-Time Players) Sorry Boy's I'm Out!
+                "(I'm Available)",  // (I am a Sub) I'm Available! Call me if you need me!
+                "(I'm not)"         // (I am a Sub) Sorry, I'm not available this Week.
+            };
             ArrayList surveyResponderUrls;
             ArrayList availablePlayerUrls = new ArrayList();
-            int responderType = 0;
+            int responderType = -1;
 
             // Open a stream to point to the data stream coming from the Teamopolis Survey Web resource.
             try
@@ -148,22 +176,28 @@ namespace Hammertime
                 {
                     // Get a line of source text from the HTML file
                     pageLine = mySurveyReader.ReadLine();
-                    // Check to see whether it contains the survey URL
                     if (pageLine != null)
                     {
-                        if (FindSurveyResponders(pageLine, out surveyResponderUrls))
+                        // Before we search for responder names let's find out what kind of responders they might be
+                        // We are only interested in responder types 0 (Full-time and available) and 2 (Sub and available)
+                        // The responderType will serve as an index into the responderTypePatterns string array.
+                        // If a match occurs then we will keep parsing, looking for the survey responders
+                        Match match = Regex.Match(pageLine, responderTypePatterns[responderType+1]);
+                        if (match.Groups[1].Value != "")
                         {
-                            if (responderType == 0 || responderType == 2)
-                            {
-                                foreach (string url in surveyResponderUrls)
-                                    availablePlayerUrls.Add(url);
-                            }
+                            responderType++;
+                            //Console.WriteLine($"{responderTypePatterns[responderType]}");
+                        }
 
-                            responderType++; // Keep the index current, whether we use it or not
+                        if ((responderType == 0 || responderType == 2) &&
+                            FindSurveyResponders(pageLine, out surveyResponderUrls))
+                        {
+                            foreach (string url in surveyResponderUrls)
+                                availablePlayerUrls.Add(url);
                         }
                     }
 
-                } while (pageLine != null);
+                } while (pageLine != null && responderType < 3);
 
                 mySurveyStream.Close();
                 mySurveyReader.Close();
@@ -180,8 +214,6 @@ namespace Hammertime
             {
                 Console.WriteLine($"Error opening Teamopolis Survey URL: {ex.Message}");
             }
-
-            // _teamopolisSurveyResponders = surveyResponderUrls;
         }
 
         // =====================================================
@@ -206,7 +238,7 @@ namespace Hammertime
         }
 
         // =====================================================
-        public void TeamopolisSurveyResults()
+        private void TeamopolisSurveyResults()
         // =====================================================
         {
             var webClient = new WebClient(); // For communicating with the Teamopolis site
@@ -217,6 +249,7 @@ namespace Hammertime
                 Stream myStream = webClient.OpenRead(_teamopolisUrl);
                 StreamReader myReader = new StreamReader(myStream);
 
+                //Console.WriteLine("Retrieving Teamopolis survey responders.");
                 string pageLine;
                 do
                 {

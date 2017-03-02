@@ -80,11 +80,6 @@ namespace Hammertime
             // Get user credentials
             GetCredentials(out uid, out password);
 
-            // Get the Teamopolis survey URL
-            // Located here for now. Move this to the HockeyTeam.cs BuildMasterRoster method.
-            TeamopolisReader reader = new TeamopolisReader();
-            reader.TeamopolisSurveyResults();
-
             // Log in to server
             DbConnection dbConnection = DbConnection.getInstance(server, database, uid, password);
 

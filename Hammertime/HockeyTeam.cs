@@ -15,6 +15,15 @@
 // material is strictly forbidden unless prior written permission
 // is obtained David Hammond.
 // ==============================================================
+//  Rules of the road for generating a team roster:
+//  1. Which players are available? From the survey.
+//  2. No more than 10(S)+1(G) players per team.
+//  3. Specific full-time players stay with specific teams (Ben and Barry).
+//  4. Unaffiliated players can be assigned to any team.
+//  5. Remaining full-time assignments next; then subs.
+//  6. Each team has one goalie.
+//  7. Team skill scores must be very close.
+// ==============================================================
 
 using System;
 using System.Collections;
@@ -24,23 +33,65 @@ namespace Hammertime
 {
     public abstract class HockeyTeam
     {
+        protected static ArrayList _availableFullTimePlayers;
+        protected static ArrayList _availableSubPlayers;
+
         public enum Residence
         {
             Home,
             Away
         }
 
-        // Public
+        public int FullTimePlayerCount  { get { return _availableFullTimePlayers.Count; } }
+        public int SubPlayerCount       { get { return _availableSubPlayers.Count; } }
+        public Residence Location       { get; set; }
+        private static bool RostersInitialized { get; set; }
+
+        // ==============================================================
         public HockeyTeam(Residence residence)
+        // ==============================================================
         {
             // Establish home/away (white/dark)
             Location = residence;
-
-           // Build the master roster
-            BuildMasterRoster();
+            // Build the master roster
+            BuildAvailablePlayerRosters();
         }
 
+        // ==============================================================
+        protected int getTeamScore(ArrayList teamRoster)
+        // ==============================================================
+        {
+            int score = 0;
+
+            var query = from HockeyPlayer player in teamRoster
+                        select player;
+
+            foreach (HockeyPlayer player in query)
+            {
+                switch (player.Level)
+                {
+                    case HockeyPlayer.PlayerSkill.Level_A:
+                        score += 1000;
+                        break;
+                    case HockeyPlayer.PlayerSkill.Level_B:
+                        score += 100;
+                        break;
+                    case HockeyPlayer.PlayerSkill.Level_C:
+                        score += 10;
+                        break;
+                    case HockeyPlayer.PlayerSkill.Level_D:
+                    default:
+                        score += 1;
+                        break;
+                }
+            }
+
+            return score;
+        }
+
+        // ==============================================================
         protected void PrintTeamRoster(ArrayList teamRoster)
+        // ==============================================================
         {
             string formatString = "{0,22}{1,10} |{2,7} |{3,10} |{4,15}";
             string teamId;
@@ -98,9 +149,6 @@ namespace Hammertime
             Console.WriteLine();
         }
 
-        public Residence Location { get; set; }
-        private static bool MasterRosterInitialized { get; set; }
-
         // Private
         private HockeyTeam() {; }
         private HockeyTeam(HockeyTeam team) // Copy constructor
@@ -108,22 +156,86 @@ namespace Hammertime
             Location = team.Location;
         }
 
+        // ==============================================================
+        // Add a skill level player to the roster if one is available.
+        // First try the available full time roster players.
+        // If nothing available try the available sub players.
+        // Return true if added; false if not added.
+        // ==============================================================
+        protected bool AddASkillPlayer(ArrayList teamRoster, HockeyPlayer.PlayerSkill skillLevel)
+        // ==============================================================
+        {
+            bool playerAdded = false;
+
+            var query = from HockeyPlayer player in _availableFullTimePlayers
+                        select player;
+
+            foreach (HockeyPlayer player in query)
+            {
+                if ((player.AssignedToTeam == false) &&
+                    (player.Level == skillLevel))
+                {
+                    playerAdded = true;
+                    player.AssignedToTeam = true;
+                    teamRoster.Add(player);
+                }
+
+                if (playerAdded) break;
+            }
+
+            if (playerAdded == false)
+            {
+                query = from HockeyPlayer player in _availableSubPlayers
+                        select player;
+
+                foreach (HockeyPlayer player in query)
+                {
+                    if ((player.AssignedToTeam == false) &&
+                        (player.Level == skillLevel))
+                    {
+                        playerAdded = true;
+                        player.AssignedToTeam = true;
+                        teamRoster.Add(player);
+                    }
+
+                    if (playerAdded) break;
+                }
+            }
+
+            return playerAdded;
+        }
+
+        // ==============================================================
         // Abstract method to build team roster based on residence (home/away)
         protected abstract void BuildTeamRoster();
 
-        private void BuildMasterRoster()
+        // ==============================================================
+        private void BuildAvailablePlayerRosters()
+        // ==============================================================
         {
-            if (MasterRosterInitialized == false)
+            if (RostersInitialized == false)
             {
-                Console.WriteLine("Retrieving the master roster.");
+                //Console.WriteLine("Building the master roster.");
+                _availableFullTimePlayers = new ArrayList();
+                _availableSubPlayers = new ArrayList();
 
                 DbConnection myDbConnection = DbConnection.getInstance();
-                _masterRoster = myDbConnection.Select();            // Read the records out of the DB
+                ArrayList _availablePlayers = TeamopolisReader.Instance.AvailablePlayers;
 
-                MasterRosterInitialized = true;
+                foreach (string player in _availablePlayers)
+                {
+                    HockeyPlayer dbPlayer = myDbConnection.SelectPlayer(player);
+                    if (dbPlayer != null)
+                    {
+                        if (dbPlayer.PlayerType == 'F')
+                            _availableFullTimePlayers.Add(dbPlayer);
+                        else
+                            _availableSubPlayers.Add(dbPlayer);
+                    }
+                }
+
+                RostersInitialized = true;
             }
         }
-
-        protected static ArrayList _masterRoster;
     }
 }

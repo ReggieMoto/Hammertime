@@ -40,7 +40,6 @@ namespace Hammertime
         {
             // Base class: Attach to the DB server
             // Base class: Build a roster from the server
-            Console.WriteLine("Initializing the visiting team.");
             BuildTeamRoster();
         }
 
@@ -49,20 +48,36 @@ namespace Hammertime
             PrintTeamRoster(_visitorRoster);
         }
 
+        // ==============================================================
+        //  Rules of the road for generating a team roster:
+        //  1. Which players are available? From the survey.
+        //  2. No more than 10(S)+1(G) players per team.
+        //  3. Specific full-time players stay with specific teams (Ben and Barry).
+        //  4. Unaffiliated players can be assigned to any team.
+        //  5. Remaining full-time assignments next; then subs.
+        //  6. Each team has one goalie.
+        //  7. Team skill scores must be very close.
+        // ==============================================================
         protected override void BuildTeamRoster()
+        // ==============================================================
         {
-            Console.WriteLine("Building the visiting team roster.");
+            //Console.WriteLine("Building the visiting team roster.");
 
             _visitorRoster = new ArrayList();
 
             // The visiting team is the "dark" team
             // Look to see which which players were on the home "white" team last week and make them the visiting "dark" team this week
-            foreach (HockeyPlayer player in _masterRoster)
+            foreach (HockeyPlayer player in _availableFullTimePlayers)
             {
-                if ((player.PlayerType == 'F') &&       // Full-time player
-                    (player.PlayerLastWeek == "White")) // Last week player was on the home "white" team
+                // First get available full-time players associated with either Ben or Barry
+                if ((player.AssignedToTeam == false) &&
+                    (player.PlayerTeam != "Unaffiliated") &&    // Not unaffiliated means affiliated with either Ben or Barry
+                    (player.PlayerLastWeek == "White"))         // Last week player was on the home "white" team
+
                 {
-                    _visitorRoster.Add(player); // This week the player will be on the visiting "dark" team
+                    player.AssignedToTeam = true;
+                    player.PlayerLastWeek = "Black";    // This week the player will be on the visiting "black" team
+                    _visitorRoster.Add(player);
                 }
             }
 

@@ -30,7 +30,9 @@ namespace Hammertime
         private static string _connectionString;
         private static bool _connected;
 
+        // =====================================================
         public static DbConnection getInstance(string server=null, string database = null, string uid = null, string password = null)
+        // =====================================================
         {
             if (_dbConnection == null)
             {
@@ -47,8 +49,10 @@ namespace Hammertime
             return _dbConnection;
         }
 
+        // =====================================================
         //Constructor
         private DbConnection()
+        // =====================================================
         {
             _connection = new MySqlConnection(_connectionString);
 
@@ -65,13 +69,17 @@ namespace Hammertime
             }
         }
 
+        // =====================================================
         public bool Connected
+        // =====================================================
         {
             get { return _connected; }
         }
 
+        // =====================================================
         //open connection to database
         public bool OpenConnection()
+        // =====================================================
         {
             try
             {
@@ -87,8 +95,10 @@ namespace Hammertime
             }
         }
 
+        // =====================================================
         //Close connection
         public bool CloseConnection()
+        // =====================================================
         {
             try
             {
@@ -120,14 +130,72 @@ namespace Hammertime
         {
         }
 
+        // =====================================================
         // Select Statement
-        public ArrayList Select()
+        public HockeyPlayer SelectPlayer(string playerName)    // Expect "first last"
+        // =====================================================
+        {
+            HockeyPlayer player = null;
+            string query = null;
+
+            if (OpenConnection() == true)
+            {
+                // Parse the string into last_name/first_name
+                string[] name = playerName.Split(' ');
+                if (name.Length == 3 && name[1] == "St.")
+                    query = $"SELECT * FROM players WHERE player_last_name = \"" + name[1] + " " + name[2] + "\" AND player_first_name = \"" + name[0] + "\"";
+                else
+                    query = $"SELECT * FROM players WHERE player_last_name = \"" + name[1] + "\" AND player_first_name = \"" + name[0] + "\"";
+
+                //Create Command
+                MySqlCommand cmd = new MySqlCommand(query, _connection);
+                //Create a data reader and Execute the command
+                MySqlDataReader dataReader = cmd.ExecuteReader();
+
+                while (dataReader.Read())
+                {
+                    var index = dataReader["player_id"] + "";
+                    var lastName = dataReader["player_last_name"] + "";
+                    var firstName = dataReader["player_first_name"] + "";
+                    var level = dataReader["player_level"] + "";
+                    var position = dataReader["player_position"] + "";
+                    var type = dataReader["player_type"] + "";
+                    var team = dataReader["player_team"] + "";
+                    var lastWeek = dataReader["player_last_wk"] + "";
+
+                    int playerId;
+                    int.TryParse(index, out playerId);
+
+                    HockeyPlayer.PlayerSkill skillLevel;
+                    if (level == "D")
+                        skillLevel = HockeyPlayer.PlayerSkill.Level_D;
+                    else if (level == "C")
+                        skillLevel = HockeyPlayer.PlayerSkill.Level_C;
+                    else if (level == "B")
+                        skillLevel = HockeyPlayer.PlayerSkill.Level_B;
+                    else // (level == "A")
+                        skillLevel = HockeyPlayer.PlayerSkill.Level_A;
+
+                    player = new HockeyPlayer(playerId, lastName, firstName, skillLevel, position, type[0], team, lastWeek);
+                }
+
+                CloseConnection();
+            }
+
+            return player;
+
+        }
+
+        // =====================================================
+        // Select Statement
+        public ArrayList SelectAllPlayers()
+        // =====================================================
         {
             ArrayList playerList = new ArrayList();
 
             if (OpenConnection() == true)
             {
-                var query = "SELECT * FROM players ORDER BY player_level";
+                string query = "SELECT * FROM players ORDER BY player_level";
 
                 //Create Command
                 MySqlCommand cmd = new MySqlCommand(query, _connection);
@@ -167,8 +235,10 @@ namespace Hammertime
             return playerList;
         }
 
+        // =====================================================
         //Count statement
         public int Count()
+        // =====================================================
         {
             string query = "SELECT Count(*) FROM players";
             int Count = 0;
@@ -199,8 +269,10 @@ namespace Hammertime
         {
         }
 
+        // =====================================================
         // Parse Exceptions
         private void ParseException(MySqlException ex)
+        // =====================================================
         {
             //When handling errors, you can your application's response based 
             //on the error number.
