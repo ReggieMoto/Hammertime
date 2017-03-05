@@ -65,7 +65,7 @@ namespace Hammertime
 
         public override bool AddASkillPlayer(HockeyPlayer.PlayerSkill skillLevel)
         {
-            Console.WriteLine("AddASkillPlayer for the home team");
+            //Console.WriteLine("AddASkillPlayer for the home team");
             return AddASkillPlayer(_homeRoster, skillLevel);
         }
 

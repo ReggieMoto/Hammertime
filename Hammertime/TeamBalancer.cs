@@ -23,6 +23,16 @@ using System.Text;
 
 namespace Hammertime
 {
+    public class TeamBalancerException : System.Exception
+    {
+        string _message;
+
+        public TeamBalancerException(string message) : base(message)
+        {
+            _message = message;
+        }
+    }
+
     public class TeamBalancer
     {
         private static TeamBalancer _teamBalancer;
@@ -42,7 +52,7 @@ namespace Hammertime
         }
 
         // ==============================================================
-        private bool AddLowerSkillPlayer(HockeyTeam team)
+        private bool AddLowerSkillPlayer(HockeyTeam team, int scoreDifferential)
         // ==============================================================
         {
             bool addedPlayerToRoster = false;
@@ -53,29 +63,50 @@ namespace Hammertime
             else
                 teamInstance = VisitorTeam.Instance;
 
-            Console.WriteLine("AddLowerSkillLevelPlayer: Check for Level D");
-            addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
-            if (addedPlayerToRoster == false)
+            //Console.WriteLine($"Entering AddLowerSkillPlayer: scoreDifferential = {scoreDifferential}");
+
+            if (scoreDifferential <= 1)
             {
-                Console.WriteLine("AddLowerSkillLevelPlayer: Check for Level C");
-                addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
-            }
-            if (addedPlayerToRoster == false)
-            {
-                Console.WriteLine("AddLowerSkillLevelPlayer: Check for Level B");
-                addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
-            }
-            if (addedPlayerToRoster == false)
-            {
-                Console.WriteLine("AddLowerSkillLevelPlayer: Check for Level A");
-                addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
+                //Console.WriteLine("AddLowerSkillLevelPlayer: Try Level D");
+                addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
             }
 
+            if (addedPlayerToRoster == false && scoreDifferential == 2)
+            {
+                //Console.WriteLine("AddLowerSkillLevelPlayer: Try Level C");
+                addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
+                if (addedPlayerToRoster == false)
+                    addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
+            }
+
+            if (addedPlayerToRoster == false && scoreDifferential == 3)
+            {
+                //Console.WriteLine("AddLowerSkillLevelPlayer: Try Level B");
+                addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
+                if (addedPlayerToRoster == false)
+                    addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
+                if (addedPlayerToRoster == false)
+                    addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
+            }
+
+            if (addedPlayerToRoster == false && scoreDifferential == 4)
+            {
+                //Console.WriteLine("AddLowerSkillLevelPlayer: Try Level A");
+                addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
+                if (addedPlayerToRoster == false)
+                    addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
+                if (addedPlayerToRoster == false)
+                    addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
+                if (addedPlayerToRoster == false)
+                    addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
+            }
+
+            //Console.WriteLine($"addedPlayerToRoster: {addedPlayerToRoster}");
             return addedPlayerToRoster;
         }
 
         // ==============================================================
-        private bool AddHigherSkillPlayer(HockeyTeam team, int[] teamCompositionDiff)
+        private bool AddHigherSkillPlayer(HockeyTeam team, int[] teamCompositionDiff, int scoreDifferential)
         // ==============================================================
         {
             bool addedPlayerToRoster = false;
@@ -86,10 +117,12 @@ namespace Hammertime
             else
                 teamInstance = VisitorTeam.Instance;
 
+            //Console.WriteLine($"Entering AddHigherSkillPlayer: scoreDifferential = {scoreDifferential}");
+
             // Check for Level A
             if (teamCompositionDiff[0] != 0)
             {
-                Console.WriteLine("AddHighSkillLevelPlayer: Check for Level A");
+                //Console.WriteLine("AddHighSkillLevelPlayer: Check for Level A");
                 addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
                 if (addedPlayerToRoster == false)
                     addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
@@ -100,9 +133,9 @@ namespace Hammertime
             }
 
             // Check for Level B
-            if (addedPlayerToRoster == false && (teamCompositionDiff[1] != 0))
+            else if (teamCompositionDiff[1] != 0)
             {
-                Console.WriteLine("AddHighSkillLevelPlayer: Check for Level B");
+                //Console.WriteLine("AddHighSkillLevelPlayer: Check for Level B");
                 addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
                 if (addedPlayerToRoster == false)
                     addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
@@ -111,21 +144,22 @@ namespace Hammertime
             }
 
             // Check for Level C
-            if (addedPlayerToRoster == false && (teamCompositionDiff[2] != 0))
+            else if (teamCompositionDiff[2] != 0)
             {
-                Console.WriteLine("AddHighSkillLevelPlayer: Check for Level C");
+                //Console.WriteLine("AddHighSkillLevelPlayer: Check for Level C");
                 addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
                 if (addedPlayerToRoster == false)
                     addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
             }
 
             // Check for Level D
-            if (addedPlayerToRoster == false && (teamCompositionDiff[3] != 0))
+            else // (teamCompositionDiff[3] != 0)
             {
-                Console.WriteLine("AddHighSkillLevelPlayer: Check for Level D");
+                //Console.WriteLine("AddHighSkillLevelPlayer: Check for Level D");
                 addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
             }
 
+            //Console.WriteLine($"addedPlayerToRoster: {addedPlayerToRoster}");
             return addedPlayerToRoster;
         }
 
@@ -170,185 +204,40 @@ namespace Hammertime
                 if (home.PlayerCount <= visitor.PlayerCount)
                 {
                     // Add a player to the home team
-                    if (HockeyTeam.StrongerTeam(home, visitor) == visitor)
+                    if (visitor.TeamScore >= home.TeamScore)
                     {
                         // Added highest player available
-                        addedToHome = AddHigherSkillPlayer(home, SkillDifference(visitor.TeamComposition, home.TeamComposition));
+                        addedToHome = AddHigherSkillPlayer(home, SkillDifference(visitor.TeamComposition, home.TeamComposition), visitor.TeamScore - home.TeamScore);
                     }
-                    else // (HockeyTeam.StrongerTeam(home, visitor) == visitor)
+                    else // (home.TeamScore > visitor.TeamScore)
                     {
                         // Add lowest player available
-                        addedToHome = AddLowerSkillPlayer(home);
+                        addedToHome = AddLowerSkillPlayer(home, home.TeamScore - visitor.TeamScore);
                     }
                 }
                 else // (home.PlayerCount > visitor.PlayerCount)
                 {
                     // Add a player to the visitor team
-                    if (HockeyTeam.StrongerTeam(home, visitor) == home)
+                    if (home.TeamScore >= visitor.TeamScore)
                     {
                         // Added highest player available
-                        addedToVisitor = AddHigherSkillPlayer(visitor, SkillDifference(home.TeamComposition, visitor.TeamComposition));
+                        addedToVisitor = AddHigherSkillPlayer(visitor, SkillDifference(home.TeamComposition, visitor.TeamComposition), home.TeamScore - visitor.TeamScore);
                     }
-                    else // (visitor.TeamComposition > home.TeamComposition)
+                    else // (visitor.TeamScore > home.TeamScore)
                     {
                         // Add lowest player available
-                        addedToVisitor = AddLowerSkillPlayer(visitor);
+                        addedToVisitor = AddLowerSkillPlayer(visitor, visitor.TeamScore - home.TeamScore);
                     }
                 }
-                Console.WriteLine();
+                //Console.WriteLine();
                 if (addedToHome == false && addedToVisitor == false)
                     moreAvailablePlayers = false;
             }
 
-            Console.WriteLine($"moreAvailablePlayers: {moreAvailablePlayers}.");
-            Console.WriteLine($"Control counter: {controlCounter}.");
+            //Console.WriteLine($"Control counter: {controlCounter}.");
+
+            if (controlCounter > 20) throw (new TeamBalancerException("Error: Runaway Balance method."));
+
         }
-
-        /*
-        // ==============================================================
-        public void Balance(HomeTeam home, VisitorTeam visitor)
-        // ==============================================================
-        {
-            bool moreAvailablePlayers = true;
-            int controlCounter = 0;
-
-            // As long as either team has less than 10 players and there are more available players
-            // Keep adding players. The team compositions and scores are factored in below.
-            while ((home.PlayerCount < 10 ||
-                visitor.PlayerCount < 10) &&
-                moreAvailablePlayers == true &&
-                controlCounter++ <= 20) // Emergency runaway shutoff
-            {
-                // Get how many A's, B's, C's and D's there are per team
-                int homeTeamComposition = home.TeamComposition;
-                int visitorTeamComposition = visitor.TeamComposition;
-                // Get a count of how many players per team there are
-                int homeTeamPlayerCount = home.PlayerCount;
-                int visitorTeamPlayerCount = visitor.PlayerCount;
-                // Booleans to keep track of whether players have been added or not
-                bool addedToHome = false, addedToVisitor = false;
-
-                int teamCompositionDiff = 0;
-                if (homeTeamComposition <= visitorTeamComposition)
-                    teamCompositionDiff = visitorTeamComposition - homeTeamComposition;
-
-                // Gotta start somewhere so start with the home team
-                if ((homeTeamPlayerCount < 10) &&
-                    (homeTeamPlayerCount <= visitorTeamPlayerCount) &&
-                    (homeTeamComposition <= visitorTeamComposition))
-                {
-                    // Check for Level A
-                    if (teamCompositionDiff/1000 != 0)
-                    {
-                        Console.WriteLine("Home team: Check for Level A");
-                        addedToHome = home.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
-                        if (addedToHome == false)
-                            addedToHome = home.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
-                        if (addedToHome == false)
-                            addedToHome = home.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
-                        if (addedToHome == false)
-                            addedToHome = home.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
-                    }
-
-                    // Check for Level B
-                    if ((teamCompositionDiff / 1000 != 0) && addedToHome == false)
-                    {
-                        Console.WriteLine("Home team: Check for Level B");
-                        teamCompositionDiff -= (teamCompositionDiff / 1000) * 1000;
-
-                        if (teamCompositionDiff/100 != 0)
-                            addedToHome = home.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
-                        if (addedToHome == false)
-                            addedToHome = home.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
-                        if (addedToHome == false)
-                            addedToHome = home.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
-                    }
-
-                    // Check for Level C
-                    if ((teamCompositionDiff / 100 != 0) && addedToHome == false)
-                    {
-                        Console.WriteLine("Home team: Check for Level C");
-                        teamCompositionDiff -= (teamCompositionDiff / 100) * 100;
-
-                        if (teamCompositionDiff / 10 != 0)
-                            addedToHome = home.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
-                        if (addedToHome == false)
-                            addedToHome = home.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
-                    }
-
-                    // Check for Level D
-                    if ((teamCompositionDiff / 10 != 0) && addedToHome == false)
-                    {
-                        Console.WriteLine("Home team: Check for Level D");
-                        teamCompositionDiff -= (teamCompositionDiff / 10) * 10;
-
-                        if (teamCompositionDiff / 1 != 0)
-                            addedToHome = home.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
-                    }
-                }
-
-                // Now check on the visiting team
-                if ((visitorTeamPlayerCount < 10) &&
-                    (visitorTeamPlayerCount <= homeTeamPlayerCount) &&
-                    (visitorTeamComposition <= homeTeamComposition))
-                {
-                    int teamCompositionDiff = homeTeamComposition - visitorTeamComposition;
-
-                    // Check for Level A
-                    if (teamCompositionDiff / 1000 != 0)
-                    {
-                        Console.WriteLine("Visitor team: Check for Level A");
-                        addedToVisitor = visitor.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
-                        if (addedToVisitor == false)
-                            addedToVisitor = visitor.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
-                        if (addedToVisitor == false)
-                            addedToVisitor = visitor.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
-                        if (addedToVisitor == false)
-                            addedToVisitor = visitor.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
-                    }
-
-                    // Check for Level B
-                    if ((teamCompositionDiff / 1000 != 0) && addedToVisitor == false)
-                    {
-                        Console.WriteLine("Visitor team: Check for Level B");
-                        teamCompositionDiff -= (teamCompositionDiff / 1000) * 1000;
-
-                        if (teamCompositionDiff / 100 != 0)
-                            addedToVisitor = visitor.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
-                        if (addedToVisitor == false)
-                            addedToVisitor = visitor.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
-                        if (addedToVisitor == false)
-                            addedToVisitor = visitor.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
-                    }
-
-                    // Check for Level C
-                    if ((teamCompositionDiff / 100 != 0) && addedToVisitor == false)
-                    {
-                        Console.WriteLine("Visitor team: Check for Level C");
-                        teamCompositionDiff -= (teamCompositionDiff / 100) * 100;
-
-                        if (teamCompositionDiff / 10 != 0)
-                            addedToVisitor = visitor.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
-                        if (addedToVisitor == false)
-                            addedToVisitor = visitor.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
-                    }
-
-                    // Check for Level D
-                    if ((teamCompositionDiff / 10 != 0) && addedToVisitor == false)
-                    {
-                        Console.WriteLine("Visitor team: Check for Level D");
-                        teamCompositionDiff -= (teamCompositionDiff / 10) * 10;
-
-                        if (teamCompositionDiff / 1 != 0)
-                            addedToVisitor = visitor.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
-                    }
-                    if (addedToHome == false && addedToVisitor == false)
-                        moreAvailablePlayers = false;
-                }
-            }
-
-            Console.WriteLine($"Control counter: {controlCounter}.");
-        }
-        */
     }
 }

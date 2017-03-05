@@ -209,7 +209,7 @@ namespace Hammertime
 
             Console.WriteLine();
             int[] teamComposition = TeamComposition(teamRoster);
-            Console.WriteLine($"Team talent composition: A: {teamComposition[0]} B: {teamComposition[1]} C: {teamComposition[2]} D: {teamComposition[3]}");
+            Console.WriteLine($"Team talent composition: {teamComposition[0]}{teamComposition[1]}{teamComposition[2]}{teamComposition[3]}");
             Console.WriteLine($"Team talent score: {TeamScore(teamRoster)}");
             Console.WriteLine();
         }
@@ -242,7 +242,7 @@ namespace Hammertime
                 if ((player.AssignedToTeam == false) &&
                     (player.Level == skillLevel))
                 {
-                    Console.WriteLine("AddASkillPlayer from _availableFullTimePlayers");
+                    //Console.WriteLine("AddASkillPlayer from _availableFullTimePlayers");
                     playerAdded = true;
                     player.AssignedToTeam = true;
                     teamRoster.Add(player);
@@ -261,7 +261,7 @@ namespace Hammertime
                     if ((player.AssignedToTeam == false) &&
                         (player.Level == skillLevel))
                     {
-                        Console.WriteLine("AddASkillPlayer from _availableSubPlayers");
+                        //Console.WriteLine("AddASkillPlayer from _availableSubPlayers");
                         playerAdded = true;
                         player.AssignedToTeam = true;
                         teamRoster.Add(player);

@@ -89,10 +89,18 @@ namespace Hammertime
                 VisitorTeam dark = VisitorTeam.Instance;
 
                 TeamBalancer balancer = TeamBalancer.Instance;
-                balancer.Balance(white, dark);
 
-                white.PrintHomeTeamRoster();
-                dark.PrintVisitingTeamRoster();
+                try
+                {
+                    balancer.Balance(white, dark);
+
+                    white.PrintHomeTeamRoster();
+                    dark.PrintVisitingTeamRoster();
+                }
+                catch (TeamBalancerException ex)
+                {
+                    Console.WriteLine($"Error running TeamBalancer: {ex.Message}");
+                }
             }
         }
     }
