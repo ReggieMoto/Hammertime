@@ -48,6 +48,27 @@ namespace Hammertime
             PrintTeamRoster(_homeRoster);
         }
 
+        public new int TeamScore
+        {
+            get { return TeamScore(_homeRoster); }
+        }
+
+        public new int[] TeamComposition
+        {
+            get { return TeamComposition(_homeRoster); }
+        }
+
+        public override int PlayerCount
+        {
+            get { return _homeRoster.Count; }
+        }
+
+        public override bool AddASkillPlayer(HockeyPlayer.PlayerSkill skillLevel)
+        {
+            Console.WriteLine("AddASkillPlayer for the home team");
+            return AddASkillPlayer(_homeRoster, skillLevel);
+        }
+
         // ==============================================================
         //  Rules of the road for generating a team roster:
         //  1. Which players are available? From the survey and base class contains lists.

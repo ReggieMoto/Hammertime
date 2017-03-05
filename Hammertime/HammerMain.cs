@@ -86,9 +86,12 @@ namespace Hammertime
             if (dbConnection.Connected)
             {
                 HomeTeam white = HomeTeam.Instance;
-                white.PrintHomeTeamRoster();
-
                 VisitorTeam dark = VisitorTeam.Instance;
+
+                TeamBalancer balancer = TeamBalancer.Instance;
+                balancer.Balance(white, dark);
+
+                white.PrintHomeTeamRoster();
                 dark.PrintVisitingTeamRoster();
             }
         }

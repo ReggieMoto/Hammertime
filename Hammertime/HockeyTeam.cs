@@ -53,12 +53,80 @@ namespace Hammertime
         {
             // Establish home/away (white/dark)
             Location = residence;
-            // Build the master roster
+            // Build the available player rosters from Teamopolis
             BuildAvailablePlayerRosters();
         }
 
+
         // ==============================================================
-        protected int getTeamScore(ArrayList teamRoster)
+        public static HockeyTeam StrongerTeam(HomeTeam home, VisitorTeam visitor)
+        // ==============================================================
+        {
+            int[] homeComposition = home.TeamComposition;
+            int[] VisitorComposition = visitor.TeamComposition;
+
+            if (homeComposition[0] == VisitorComposition[0])
+            {
+                if (homeComposition[1] == VisitorComposition[1])
+                {
+                    if (homeComposition[2] == VisitorComposition[2])
+                    {
+                        if (homeComposition[3] >= VisitorComposition[3])
+                            return home;
+                        else
+                            return visitor;
+                    }
+                    else if (homeComposition[2] > VisitorComposition[2])
+                        return home;
+                    else
+                        return visitor;
+                }
+                else if (homeComposition[1] > VisitorComposition[1])
+                    return home;
+                else
+                    return visitor;
+            }
+            else if (homeComposition[0] > VisitorComposition[0])
+                return home;
+            else
+                return visitor;
+
+        }
+        // ==============================================================
+        protected int[] TeamComposition(ArrayList teamRoster)
+        // ==============================================================
+        {
+            int[] composition = new int[] { 0, 0, 0, 0 };
+
+            var query = from HockeyPlayer player in teamRoster
+                        select player;
+
+            foreach (HockeyPlayer player in query)
+            {
+                switch (player.Level)
+                {
+                    case HockeyPlayer.PlayerSkill.Level_A:
+                        composition[0]++; ;
+                        break;
+                    case HockeyPlayer.PlayerSkill.Level_B:
+                        composition[1]++; ;
+                        break;
+                    case HockeyPlayer.PlayerSkill.Level_C:
+                        composition[2]++; ;
+                        break;
+                    case HockeyPlayer.PlayerSkill.Level_D:
+                    default:
+                        composition[3]++; ;
+                        break;
+                }
+            }
+
+            return composition;
+        }
+
+
+        // ==============================================================
+        protected int TeamScore(ArrayList teamRoster)
         // ==============================================================
         {
             int score = 0;
@@ -71,13 +139,13 @@ namespace Hammertime
                 switch (player.Level)
                 {
                     case HockeyPlayer.PlayerSkill.Level_A:
-                        score += 1000;
+                        score += 4;
                         break;
                     case HockeyPlayer.PlayerSkill.Level_B:
-                        score += 100;
+                        score += 3;
                         break;
                     case HockeyPlayer.PlayerSkill.Level_C:
-                        score += 10;
+                        score += 2;
                         break;
                     case HockeyPlayer.PlayerSkill.Level_D:
                     default:
@@ -110,7 +178,6 @@ namespace Hammertime
             Console.WriteLine(formatString, teamId, "Player", "Level", "Position", "Team");
             Console.WriteLine("==========================================================================");
 
-            int score = 0;
             string level;
             formatString = "{0,32} |{1,7} |{2,10} |{3,15}";
 
@@ -123,20 +190,16 @@ namespace Hammertime
                 {
                     case HockeyPlayer.PlayerSkill.Level_A:
                         level = "A";
-                        score += 1000;
                         break;
                     case HockeyPlayer.PlayerSkill.Level_B:
                         level = "B";
-                        score += 100;
                         break;
                     case HockeyPlayer.PlayerSkill.Level_C:
                         level = "C";
-                        score += 10;
                         break;
                     case HockeyPlayer.PlayerSkill.Level_D:
                     default:
                         level = "D";
-                        score += 1;
                         break;
                 }
 
@@ -145,7 +208,9 @@ namespace Hammertime
             }
 
             Console.WriteLine();
-            Console.WriteLine($"Team talent score: {score}");
+            int[] teamComposition = TeamComposition(teamRoster);
+            Console.WriteLine($"Team talent composition: A: {teamComposition[0]} B: {teamComposition[1]} C: {teamComposition[2]} D: {teamComposition[3]}");
+            Console.WriteLine($"Team talent score: {TeamScore(teamRoster)}");
             Console.WriteLine();
         }
 
@@ -162,6 +227,8 @@ namespace Hammertime
         // If nothing available try the available sub players.
         // Return true if added; false if not added.
         // ==============================================================
+        public abstract bool AddASkillPlayer(HockeyPlayer.PlayerSkill skillLevel);
+        // ==============================================================
         protected bool AddASkillPlayer(ArrayList teamRoster, HockeyPlayer.PlayerSkill skillLevel)
         // ==============================================================
         {
@@ -175,6 +242,7 @@ namespace Hammertime
                 if ((player.AssignedToTeam == false) &&
                     (player.Level == skillLevel))
                 {
+                    Console.WriteLine("AddASkillPlayer from _availableFullTimePlayers");
                     playerAdded = true;
                     player.AssignedToTeam = true;
                     teamRoster.Add(player);
@@ -193,6 +261,7 @@ namespace Hammertime
                     if ((player.AssignedToTeam == false) &&
                         (player.Level == skillLevel))
                     {
+                        Console.WriteLine("AddASkillPlayer from _availableSubPlayers");
                         playerAdded = true;
                         player.AssignedToTeam = true;
                         teamRoster.Add(player);
@@ -208,6 +277,10 @@ namespace Hammertime
         // ==============================================================
         // Abstract method to build team roster based on residence (home/away)
         protected abstract void BuildTeamRoster();
+
+        // ==============================================================
+        // Abstract property to get count of players on roster (home/away)
+        public abstract int PlayerCount { get; }
 
         // ==============================================================
         private void BuildAvailablePlayerRosters()
