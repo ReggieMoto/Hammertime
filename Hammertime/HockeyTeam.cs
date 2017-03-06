@@ -139,17 +139,17 @@ namespace Hammertime
                 switch (player.Level)
                 {
                     case HockeyPlayer.PlayerSkill.Level_A:
-                        score += 4;
+                        score += (int)HockeyPlayer.PlayerValue.Level_A;
                         break;
                     case HockeyPlayer.PlayerSkill.Level_B:
-                        score += 3;
+                        score += (int)HockeyPlayer.PlayerValue.Level_B;
                         break;
                     case HockeyPlayer.PlayerSkill.Level_C:
-                        score += 2;
+                        score += (int)HockeyPlayer.PlayerValue.Level_C;
                         break;
                     case HockeyPlayer.PlayerSkill.Level_D:
                     default:
-                        score += 1;
+                        score += (int)HockeyPlayer.PlayerValue.Level_D;
                         break;
                 }
             }
@@ -227,9 +227,65 @@ namespace Hammertime
         // If nothing available try the available sub players.
         // Return true if added; false if not added.
         // ==============================================================
-        public abstract bool AddASkillPlayer(HockeyPlayer.PlayerSkill skillLevel);
+        public abstract bool AddAGoalie(bool strongTeam);   // Provided in team classes
         // ==============================================================
-        protected bool AddASkillPlayer(ArrayList teamRoster, HockeyPlayer.PlayerSkill skillLevel)
+        protected bool AddAGoalie(ArrayList teamRoster, bool strongTeam)    // Called from team classes
+        // ==============================================================
+        {
+            bool goalieAdded = false;
+
+            var query = from HockeyPlayer player in _availableFullTimePlayers
+                        select player;
+
+            foreach (HockeyPlayer player in query)
+            {
+                if ((player.AssignedToTeam == false) &&
+                    (player.PlayerPos == "Goalie"))
+                {
+                    Console.WriteLine("AddAGoalie from _availableFullTimePlayers");
+                    goalieAdded = true;
+                    player.AssignedToTeam = true;
+                    teamRoster.Add(player);
+                }
+
+                if (goalieAdded) break;
+            }
+
+            if (goalieAdded == false)
+            {
+                query = from HockeyPlayer player in _availableSubPlayers
+                        select player;
+
+                foreach (HockeyPlayer player in query)
+                {
+                    if ((player.AssignedToTeam == false) &&
+                        (player.PlayerPos == "Goalie"))
+                    {
+                        Console.WriteLine("AddAGoalie from _availableSubPlayers");
+                        goalieAdded = true;
+                        player.AssignedToTeam = true;
+                        teamRoster.Add(player);
+                    }
+
+                    if (goalieAdded) break;
+                }
+            }
+
+            if (goalieAdded == false)
+                Console.WriteLine("Goalie not added to team.");
+
+            return goalieAdded;
+        }
+
+        // ==============================================================
+        // Add a skill level player to the roster if one is available.
+        // First try the available full time roster players.
+        // If nothing available try the available sub players.
+        // Return true if added; false if not added.
+        // ==============================================================
+        public abstract bool AddASkillPlayer(HockeyPlayer.PlayerSkill skillLevel);  // Provided in team classes
+        // ==============================================================
+        protected bool AddASkillPlayer(ArrayList teamRoster, HockeyPlayer.PlayerSkill skillLevel)    // Called from team classes
         // ==============================================================
         {
             bool playerAdded = false;
@@ -240,6 +296,7 @@ namespace Hammertime
             foreach (HockeyPlayer player in query)
             {
                 if ((player.AssignedToTeam == false) &&
+                    (player.PlayerPos != "Goalie") &&      // Save Goalies to the end
                     (player.Level == skillLevel))
                 {
                     //Console.WriteLine("AddASkillPlayer from _availableFullTimePlayers");
@@ -259,6 +316,7 @@ namespace Hammertime
                 foreach (HockeyPlayer player in query)
                 {
                     if ((player.AssignedToTeam == false) &&
+                        (player.PlayerPos != "Goalie") &&      // Save Goalies to the end
                         (player.Level == skillLevel))
                     {
                         //Console.WriteLine("AddASkillPlayer from _availableSubPlayers");

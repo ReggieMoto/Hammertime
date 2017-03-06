@@ -27,7 +27,9 @@ namespace Hammertime
     {
         string _message;
 
+        // ==============================================================
         public TeamBalancerException(string message) : base(message)
+        // ==============================================================
         {
             _message = message;
         }
@@ -185,6 +187,22 @@ namespace Hammertime
         }
 
         // ==============================================================
+        private void AddGoalies(HomeTeam home, VisitorTeam visitor)
+        // ==============================================================
+        {
+            if (home.TeamScore >= visitor.TeamScore)
+            {
+                home.AddAGoalie(true);
+                visitor.AddAGoalie(false);
+            }
+            else
+            {
+                home.AddAGoalie(false);
+                visitor.AddAGoalie(true);
+            }
+        }
+
+        // ==============================================================
         public void Balance(HomeTeam home, VisitorTeam visitor)
         // ==============================================================
         {
@@ -235,9 +253,9 @@ namespace Hammertime
             }
 
             //Console.WriteLine($"Control counter: {controlCounter}.");
-
             if (controlCounter > 20) throw (new TeamBalancerException("Error: Runaway Balance method."));
 
+            AddGoalies(home, visitor);
         }
     }
 }

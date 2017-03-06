@@ -42,7 +42,16 @@ namespace Hammertime
             Level_A = 1000
         }
 
+        public enum PlayerValue
+        {
+            Level_D = 1,
+            Level_C = 2,
+            Level_B = 3,
+            Level_A = 4
+        }
+
         // Public
+        // ==============================================================
         public HockeyPlayer(
             int player_id,
             string player_last_name,
@@ -52,6 +61,7 @@ namespace Hammertime
             char player_type,
             string player_team,
             string player_last_wk)
+        // ==============================================================
         {
             PlayerID = player_id;
             LastName = player_last_name;
@@ -62,6 +72,23 @@ namespace Hammertime
             PlayerTeam = player_team;
             PlayerLastWeek = player_last_wk;
             AssignedToTeam = false;
+
+            switch (Level)
+            {
+                case PlayerSkill.Level_A:
+                    PlayerScore = PlayerValue.Level_A;
+                    break;
+                case PlayerSkill.Level_B:
+                    PlayerScore = PlayerValue.Level_B;
+                    break;
+                case PlayerSkill.Level_C:
+                    PlayerScore = PlayerValue.Level_C;
+                    break;
+                case PlayerSkill.Level_D:
+                default:
+                    PlayerScore = PlayerValue.Level_D;
+                    break;
+            }
         }
 
         public int PlayerID { get; set; }
@@ -73,8 +100,11 @@ namespace Hammertime
         public string PlayerTeam { get; set; }      // Ben, Barry, Unaffiliated
         public string PlayerLastWeek { get; set; }  // White, Black, Zed (Didn't play)
         public bool AssignedToTeam { get; set; }    // Is the player assigned to a team yet
+        public PlayerValue PlayerScore { get; set; }        // Derived from Skill Level
 
-        public  HockeyPlayer(HockeyPlayer player)
+        // ==============================================================
+        public HockeyPlayer(HockeyPlayer player)
+        // ==============================================================
         {
             LastName = player.LastName;
             PlayerID = player.PlayerID;
@@ -85,6 +115,7 @@ namespace Hammertime
             PlayerTeam = player.PlayerTeam;
             PlayerLastWeek = player.PlayerLastWeek;
             AssignedToTeam = player.AssignedToTeam;
+            PlayerScore = player.PlayerScore;
         }
     }
 }

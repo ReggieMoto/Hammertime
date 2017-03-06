@@ -9,7 +9,9 @@ namespace Hammertime
 {
     public class TeamopolisReader
     {
+        // ==============================================================
         public static TeamopolisReader Instance
+        // ==============================================================
         {
             get
             {

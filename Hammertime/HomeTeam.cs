@@ -23,7 +23,9 @@ namespace Hammertime
 {
     public sealed class HomeTeam : HockeyTeam
     {
+        // ==============================================================
         public static HomeTeam Instance
+        // ==============================================================
         {
             get
             {
@@ -43,30 +45,48 @@ namespace Hammertime
             BuildTeamRoster();
         }
 
+        // ==============================================================
         public void PrintHomeTeamRoster()
+        // ==============================================================
         {
             PrintTeamRoster(_homeRoster);
         }
 
+        // ==============================================================
         public new int TeamScore
+        // ==============================================================
         {
             get { return TeamScore(_homeRoster); }
         }
 
+        // ==============================================================
         public new int[] TeamComposition
+        // ==============================================================
         {
             get { return TeamComposition(_homeRoster); }
         }
 
+        // ==============================================================
         public override int PlayerCount
+        // ==============================================================
         {
             get { return _homeRoster.Count; }
         }
 
+        // ==============================================================
         public override bool AddASkillPlayer(HockeyPlayer.PlayerSkill skillLevel)
+        // ==============================================================
         {
             //Console.WriteLine("AddASkillPlayer for the home team");
             return AddASkillPlayer(_homeRoster, skillLevel);
+        }
+
+        // ==============================================================
+        public override bool AddAGoalie(bool strongerTeam)
+        // ==============================================================
+        {
+            //Console.WriteLine("AddASkillPlayer for the home team");
+            return AddAGoalie(_homeRoster, strongerTeam);
         }
 
         // ==============================================================
@@ -97,9 +117,12 @@ namespace Hammertime
                     (player.PlayerLastWeek == "Black"))         // Last week player was on the visiting "black" team
 
                 {
-                    player.AssignedToTeam = true;
-                    player.PlayerLastWeek = "White";    // This week the player will be on the home "white" team
-                    _homeRoster.Add(player);
+                    if (player.PlayerPos != "Goalie")       // Save Goalies to the end
+                    {
+                        player.AssignedToTeam = true;
+                        player.PlayerLastWeek = "White";    // This week the player will be on the home "white" team
+                        _homeRoster.Add(player);
+                    }
                 }
             }
         }
