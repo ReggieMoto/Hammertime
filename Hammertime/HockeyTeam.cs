@@ -242,7 +242,7 @@ namespace Hammertime
                 if ((player.AssignedToTeam == false) &&
                     (player.PlayerPos == "Goalie"))
                 {
-                    Console.WriteLine("AddAGoalie from _availableFullTimePlayers");
+                    //Console.WriteLine("AddAGoalie from _availableFullTimePlayers");
                     goalieAdded = true;
                     player.AssignedToTeam = true;
                     teamRoster.Add(player);
@@ -261,7 +261,7 @@ namespace Hammertime
                     if ((player.AssignedToTeam == false) &&
                         (player.PlayerPos == "Goalie"))
                     {
-                        Console.WriteLine("AddAGoalie from _availableSubPlayers");
+                        //Console.WriteLine("AddAGoalie from _availableSubPlayers");
                         goalieAdded = true;
                         player.AssignedToTeam = true;
                         teamRoster.Add(player);
@@ -270,10 +270,10 @@ namespace Hammertime
                     if (goalieAdded) break;
                 }
             }
-
+            /*
             if (goalieAdded == false)
                 Console.WriteLine("Goalie not added to team.");
-
+            */
             return goalieAdded;
         }
 

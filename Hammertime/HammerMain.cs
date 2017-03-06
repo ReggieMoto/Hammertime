@@ -87,7 +87,6 @@ namespace Hammertime
             {
                 HomeTeam white = HomeTeam.Instance;
                 VisitorTeam dark = VisitorTeam.Instance;
-
                 TeamBalancer balancer = TeamBalancer.Instance;
 
                 try
