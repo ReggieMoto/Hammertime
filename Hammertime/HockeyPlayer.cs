@@ -16,6 +16,8 @@
 // is obtained David Hammond.
 // ==============================================================
 
+using System;
+
 namespace Hammertime
 {
     // ====================
@@ -29,6 +31,7 @@ namespace Hammertime
             FirstName,
             Level,
             Position,
+            Goalie,
             Type,
             Team,
             LastWeek
@@ -58,6 +61,7 @@ namespace Hammertime
             string player_first_name,
             PlayerSkill player_level,
             string player_position,
+            bool player_goalie,
             char player_type,
             string player_team,
             string player_last_wk)
@@ -68,6 +72,7 @@ namespace Hammertime
             FirstName = player_first_name;
             Level = player_level;
             PlayerPos = player_position;
+            Goalie = player_goalie;
             PlayerType = player_type;
             PlayerTeam = player_team;
             PlayerLastWeek = player_last_wk;
@@ -91,16 +96,24 @@ namespace Hammertime
             }
         }
 
+        public static bool NewPlayer()
+        {
+            bool newPlayerAdded = false;
+            Console.WriteLine("Add New Player: <Coming soon>");
+            return newPlayerAdded;
+        }
+
         public int PlayerID { get; set; }
         public string LastName { get; set; }
         public string FirstName { get; set; }
         public PlayerSkill Level { get; set; }
-        public string PlayerPos { get; set; }
-        public char PlayerType { get; set; }        // Full time, Sub
-        public string PlayerTeam { get; set; }      // Ben, Barry, Unaffiliated
-        public string PlayerLastWeek { get; set; }  // White, Black, Zed (Didn't play)
-        public bool AssignedToTeam { get; set; }    // Is the player assigned to a team yet
-        public PlayerValue PlayerScore { get; set; }        // Derived from Skill Level
+        public string PlayerPos { get; set; }           // Player's normal position
+        public bool Goalie { get; set; }                // Also can play goalie
+        public char PlayerType { get; set; }            // Full time, Sub
+        public string PlayerTeam { get; set; }          // Ben, Barry, Unaffiliated
+        public string PlayerLastWeek { get; set; }      // White, Black, Zed (Didn't play)
+        public bool AssignedToTeam { get; set; }        // Is the player assigned to a team yet
+        public PlayerValue PlayerScore { get; set; }    // Derived from Skill Level
 
         // ==============================================================
         public HockeyPlayer(HockeyPlayer player)
@@ -111,6 +124,7 @@ namespace Hammertime
             FirstName = player.FirstName;
             Level = player.Level;
             PlayerPos = player.PlayerPos;
+            Goalie = player.Goalie;
             PlayerType = player.PlayerType;
             PlayerTeam = player.PlayerTeam;
             PlayerLastWeek = player.PlayerLastWeek;

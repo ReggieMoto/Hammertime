@@ -18,12 +18,36 @@
 
 using System;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Hammertime
 {
+    public class HammerMainException : System.Exception
+    {
+        string _message;
+
+        // ==============================================================
+        public HammerMainException(string message) : base(message)
+        // ==============================================================
+        {
+            _message = message;
+        }
+    }
+
     class HammerMain
     {
-        static void GetCredentials(out string uid, out string password)
+        // ==============================================================
+        public static bool ReadSurveyResults { get; set; }
+        // ==============================================================
+        private static string Uid { get; set; }
+        private static string Password { get; set; }
+        private static string Server { get; set; }
+        private static string Database { get; set; }
+        // ==============================================================
+
+        // ==============================================================
+        private static void GetCredentials()
+        // ==============================================================
         {
             ConsoleKeyInfo cki;
             StringBuilder sb = new StringBuilder();
@@ -31,7 +55,7 @@ namespace Hammertime
             // Get the user
             Console.WriteLine();
             Console.Write("Login: ");
-            uid = Console.ReadLine();
+            Uid = Console.ReadLine();
 
             // Get the password
             Console.Write("password (0-9, A-Z, a-z, +, -, _, %, ^): ");
@@ -42,7 +66,7 @@ namespace Hammertime
 
                 if (cki.Key == ConsoleKey.Escape)
                 {
-                    password = null;
+                    Password = null;
                     Console.WriteLine();
                     Console.WriteLine();
                     return;
@@ -62,44 +86,122 @@ namespace Hammertime
 
             } while (cki.Key != ConsoleKey.Enter);
 
-            password = sb.ToString();
+            Password = sb.ToString();
 
             Console.WriteLine();
-            // Console.WriteLine($"uid: {uid}");
-            // Console.WriteLine($"password: {password}");
+            // Console.WriteLine($"uid: {Uid}");
+            // Console.WriteLine($"password: {Password}");
             Console.WriteLine();
         }
 
-        static void Main(string[] args)
+        // ==============================================================
+        private static void CommandLineHelp()
+        // ==============================================================
         {
-            string server = "localhost";
-            string database = "mondaynighthockey";
-            string uid = null;
-            string password = null;
+            Console.WriteLine("Hammertime command line help:");
+            Console.WriteLine("\t--Help: These instructions.");
+            Console.WriteLine("\t--ReadSurveyResults=true/false: default is true.");
+            Console.WriteLine("\t--AddNewPlayer: Opens a command line dialog for adding a new player to the database.");
+            Console.WriteLine("\t--SaveTeams: Writes team assignments to the database.");
+        }
 
-            // Get user credentials
-            GetCredentials(out uid, out password);
-
-            // Log in to server
-            DbConnection dbConnection = DbConnection.getInstance(server, database, uid, password);
-
-            if (dbConnection.Connected)
+        // ==============================================================
+        private static void ParseCmdLineArgs(string[] args)
+        // ==============================================================
+        {
+            if (args.Length == 0)
             {
-                HomeTeam white = HomeTeam.Instance;
-                VisitorTeam dark = VisitorTeam.Instance;
-                TeamBalancer balancer = TeamBalancer.Instance;
-
-                try
+                // Just run the program
+                ReadSurveyResults = true;   // Default
+            }
+            else if (args.Length > 1)
+            {
+                throw (new HammerMainException("Error: Only one command line argument allowed."));
+            }
+            else
+            {
+                foreach (string arg in args)
                 {
-                    balancer.Balance(white, dark);
+                    if (arg == "--Help" || arg == "--help")
+                    {
+                        Console.WriteLine();
+                        CommandLineHelp();
+                    }
+                    else if (arg == "--AddNewPlayer")
+                    {
+                        Console.WriteLine();
+                        if (HockeyPlayer.NewPlayer() == false)
+                            throw (new HammerMainException("Error: Currently unsupported command."));
+                    }
+                    else if (arg == "--SaveTeams")
+                    {
+                        Console.WriteLine();
+                        if (HockeyTeam.SaveTeams() == false)
+                            throw (new HammerMainException("Error: Currently unsupported command."));
+                    }
+                    else
+                    {
+                        string pattern = "=";
+                        string[] substrings = Regex.Split(arg, pattern);
 
-                    white.PrintHomeTeamRoster();
-                    dark.PrintVisitingTeamRoster();
+                        if (substrings[0] == "--ReadSurveyResults" && (substrings[1] == "true" || substrings[1] == "false"))
+                        {
+                            if (substrings[1] == "true")
+                                ReadSurveyResults = true;
+                            else
+                                ReadSurveyResults = false;
+                        }
+                        else throw (new HammerMainException("Error: Unsupported command line argument."));
+                    }
                 }
-                catch (TeamBalancerException ex)
+            }
+        }
+
+        // ==============================================================
+        static void Main(string[] args)
+        // ==============================================================
+        {
+            // Parse command line args
+            try
+            {
+                // What does the user want to do?
+                ParseCmdLineArgs(args);
+
+                // Get user credentials
+                GetCredentials();
+
+                // For now default to our Teamopolis database
+                Server   = "localhost";
+                Database = "mondaynighthockey";
+
+                // Log in to server
+                DbConnection dbConnection = DbConnection.getInstance(Server, Database, Uid, Password);
+
+                if (dbConnection.Connected)
                 {
-                    Console.WriteLine($"Error running TeamBalancer: {ex.Message}");
+                    HomeTeam white = HomeTeam.Instance;
+                    VisitorTeam dark = VisitorTeam.Instance;
+                    TeamBalancer balancer = TeamBalancer.Instance;
+
+                    try
+                    {
+                        balancer.Balance(white, dark);
+
+                        white.PrintHomeTeamRoster();
+                        dark.PrintVisitingTeamRoster();
+                    }
+                    catch (TeamBalancerException ex)
+                    {
+                        Console.WriteLine($"Error running TeamBalancer: {ex.Message}");
+                    }
                 }
+            }
+            catch (HammerMainException ex)
+            {
+                Console.WriteLine();
+                Console.WriteLine($"{ex.Message}");
+                Console.WriteLine();
+                CommandLineHelp();
             }
         }
     }

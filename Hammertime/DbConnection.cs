@@ -31,7 +31,7 @@ namespace Hammertime
         private static bool _connected;
 
         // =====================================================
-        public static DbConnection getInstance(string server=null, string database = null, string uid = null, string password = null)
+        public static DbConnection getInstance(string server = null, string database = null, string uid = null, string password = null)
         // =====================================================
         {
             if (_dbConnection == null)
@@ -120,9 +120,20 @@ namespace Hammertime
         {
         }
 
+        // =====================================================
         //Update statement
-        public void Update()
+        public bool Update()
+        // =====================================================
         {
+            bool updateStatus = false;
+
+            if (OpenConnection() == true)
+            {
+
+                CloseConnection();
+            }
+
+            return updateStatus;
         }
 
         //Delete statement
@@ -159,6 +170,7 @@ namespace Hammertime
                     var firstName = dataReader["player_first_name"] + "";
                     var level = dataReader["player_level"] + "";
                     var position = dataReader["player_position"] + "";
+                    var goalie = dataReader["player_goalie"] + "";
                     var type = dataReader["player_type"] + "";
                     var team = dataReader["player_team"] + "";
                     var lastWeek = dataReader["player_last_wk"] + "";
@@ -176,7 +188,11 @@ namespace Hammertime
                     else // (level == "A")
                         skillLevel = HockeyPlayer.PlayerSkill.Level_A;
 
-                    player = new HockeyPlayer(playerId, lastName, firstName, skillLevel, position, type[0], team, lastWeek);
+                    bool canPlayGoalie = false;
+                    if (goalie == "Y")
+                        canPlayGoalie = true;
+
+                    player = new HockeyPlayer(playerId, lastName, firstName, skillLevel, position, canPlayGoalie, type[0], team, lastWeek);
                 }
 
                 CloseConnection();
@@ -209,6 +225,7 @@ namespace Hammertime
                     var firstName = dataReader["player_first_name"] + "";
                     var level     = dataReader["player_level"] + "";
                     var position  = dataReader["player_position"] + "";
+                    var goalie    = dataReader["player_goalie"] + "";
                     var type      = dataReader["player_type"] + "";
                     var team      = dataReader["player_team"] + "";
                     var lastWeek  = dataReader["player_last_wk"] + "";
@@ -226,7 +243,11 @@ namespace Hammertime
                     else // (level == "A")
                         skillLevel = HockeyPlayer.PlayerSkill.Level_A;
 
-                    playerList.Add(new HockeyPlayer(playerId, lastName, firstName, skillLevel, position, type[0], team, lastWeek));
+                    bool canPlayGoalie = false;
+                    if (goalie == "Y")
+                        canPlayGoalie = true;
+
+                    playerList.Add(new HockeyPlayer(playerId, lastName, firstName, skillLevel, position, canPlayGoalie, type[0], team, lastWeek));
                 }
 
                 CloseConnection();

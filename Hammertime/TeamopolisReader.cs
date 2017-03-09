@@ -261,6 +261,9 @@ namespace Hammertime
         private void TeamopolisSurveyResults()
         // =====================================================
         {
+            if (HammerMain.ReadSurveyResults == false)
+                return;
+
             var webClient = new WebClient(); // For communicating with the Teamopolis site
 
             // Open a stream to point to the data stream coming from the Teamopolis Web resource.

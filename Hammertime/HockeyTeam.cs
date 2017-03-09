@@ -17,7 +17,7 @@
 // ==============================================================
 //  Rules of the road for generating a team roster:
 //  1. Which players are available? From the survey.
-//  2. No more than 10(S)+1(G) players per team.
+//  2. No more than 10+1(G) players per team.
 //  3. Specific full-time players stay with specific teams (Ben and Barry).
 //  4. Unaffiliated players can be assigned to any team.
 //  5. Remaining full-time assignments next; then subs.
@@ -57,6 +57,27 @@ namespace Hammertime
             BuildAvailablePlayerRosters();
         }
 
+        // ==============================================================
+        public static bool SaveTeams()
+        // ==============================================================
+        {
+            bool teamsSaved = false;
+            Console.WriteLine("Save teams: <Coming soon>");
+
+            if (teamsSaved == true)
+            {
+                DbConnection connection = DbConnection.getInstance();
+                var query = from HockeyPlayer player in _availableFullTimePlayers
+                            select player;
+
+                foreach (HockeyPlayer player in query)
+                {
+                    connection.Update();
+                }
+            }
+
+            return teamsSaved;
+        }
 
         // ==============================================================
         public static HockeyTeam StrongerTeam(HomeTeam home, VisitorTeam visitor)
