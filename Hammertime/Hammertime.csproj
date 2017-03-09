@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AvailablePlayerFileIO.cs" />
     <Compile Include="HammerMain.cs" />
     <Compile Include="HockeyPlayer.cs" />
     <Compile Include="HockeyTeam.cs" />

@@ -1,31 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Hammertime.HammerMain">
-    <Position X="6.25" Y="2.5" Width="1.5" />
+    <Position X="6" Y="2.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAABAAAAAA=</HashCode>
+      <HashCode>ACAAAAAAAEAAAAAAABAAAAAAAAAAEABCAABABgAAAAA=</HashCode>
       <FileName>HammerMain.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hammertime.HockeyPlayer" Collapsed="true">
-    <Position X="6.25" Y="1.5" Width="1.5" />
+    <Position X="6" Y="1.5" Width="1.5" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Enum Name="Hammertime.HockeyPlayer.PlayerAttributes" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>HockeyPlayer.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-      <Enum Name="Hammertime.HockeyPlayer.PlayerSkill" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>HockeyPlayer.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAAAEAAAEQACABAAAAAAEAgAAAAAAABAAAAAAAAAAg=</HashCode>
+      <HashCode>AAAAAEAAAkQACABAAAAAAEAgAAAIAAABAAAAAAAAAIg=</HashCode>
       <FileName>HockeyPlayer.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -39,43 +27,50 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>EAAIIAEAAAAAAAAAIBIAAAABgAEAAAgAAAAAAAAAEAA=</HashCode>
+      <HashCode>EAAIIAEAAAAAAAAAIBIAAAABgAEIAAgAACAQAAAAMAA=</HashCode>
       <FileName>HockeyTeam.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hammertime.HomeTeam">
     <Position X="0.5" Y="5.25" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAIAAAAAACIAAAABAAAAABAAEAAAAAQAAAAAAEAAA=</HashCode>
+      <HashCode>AAAAIAAAAAACIAAAABAAAAABAAEAAAAAQCAQAAAEAAA=</HashCode>
       <FileName>HomeTeam.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hammertime.VisitorTeam">
     <Position X="3.25" Y="5.25" Width="2" />
     <TypeIdentifier>
-      <HashCode>AIAAIAAAAACAAAAAABAAAAABAAEAAAEAQAAAAAAAAAA=</HashCode>
+      <HashCode>AIAAIAAAAACAAAAAABAAAAABAAEAAAEAQCAQAAAAAAA=</HashCode>
       <FileName>VisitorTeam.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hammertime.DbConnection" Collapsed="true">
-    <Position X="6.25" Y="0.5" Width="1.5" />
+    <Position X="6" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AgQAAEAAAAAAQAAAQAACgFQAhQGAABQIAAAAAAAABAA=</HashCode>
       <FileName>DbConnection.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hammertime.TeamopolisReader" Collapsed="true">
-    <Position X="8" Y="1.5" Width="1.5" />
+    <Position X="7.75" Y="1.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAACACIAQBAgAEAAAAAAAQQAABAACAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAACACIAQBAgAEAAACAAAQAAABAACAAA=</HashCode>
       <FileName>TeamopolisReader.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hammertime.TeamBalancer">
-    <Position X="8.25" Y="4.5" Width="1.5" />
+    <Position X="8" Y="2.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAQAAAAAAAAAg=</HashCode>
+      <HashCode>AIAAgAAAAAAgAAAAAggAAAAAAAAAAAAAQAAAAAAAAAg=</HashCode>
       <FileName>TeamBalancer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hammertime.AvailablePlayerFileIO">
+    <Position X="10" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgEAAAgAAAAAAAAAAAAABAAAAAAAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>AvailablePlayerFileIO.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />

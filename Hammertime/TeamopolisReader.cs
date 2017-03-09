@@ -40,14 +40,14 @@ namespace Hammertime
         }
 
         private static TeamopolisReader _teamopolisReader;  // Reader instance
-        private ArrayList _teamopolisAvalablePlayers;       // Available survey responders
+        private ArrayList _teamopolisAvailablePlayers;       // Available survey responders
         private string _teamopolisUrl;
         private string _teamopolisSurveyUrl;
 
 
         public ArrayList AvailablePlayers
         {
-                get { return _teamopolisAvalablePlayers; }
+                get { return _teamopolisAvailablePlayers; }
         }
 
         // =====================================================
@@ -55,7 +55,7 @@ namespace Hammertime
         // =====================================================
         {
             _teamopolisUrl = url;
-            _teamopolisAvalablePlayers = new ArrayList();
+            _teamopolisAvailablePlayers = new ArrayList();
             TeamopolisSurveyResults();
         }
 
@@ -100,7 +100,7 @@ namespace Hammertime
                                 int first = pageLine.IndexOf(firstSubStringPattern) + firstSubStringPattern.Length;
                                 int last = pageLine.Length - lastSubStringPattern.Length;
                                 responderName = pageLine.Substring(first, last - first);
-                                _teamopolisAvalablePlayers.Add(responderName);
+                                _teamopolisAvailablePlayers.Add(responderName);
                             }
                         }
                         catch (IOException ex)
@@ -262,38 +262,51 @@ namespace Hammertime
         // =====================================================
         {
             if (HammerMain.ReadSurveyResults == false)
-                return;
-
-            var webClient = new WebClient(); // For communicating with the Teamopolis site
-
-            // Open a stream to point to the data stream coming from the Teamopolis Web resource.
-            try
             {
-                Stream myStream = webClient.OpenRead(_teamopolisUrl);
-                StreamReader myReader = new StreamReader(myStream);
-
-                //Console.WriteLine("Retrieving Teamopolis survey responders.");
-                string pageLine;
-                do
+                try
                 {
-                    // Get a line of source text from the HTML file
-                    pageLine = myReader.ReadLine();
-                    // Check to see whether it contains the survey URL
-                    if (pageLine != null)
-                        _teamopolisSurveyUrl = TeamopolisSurveyUrl(pageLine);
-
-                } while (pageLine != null && _teamopolisSurveyUrl == null);
-
-                myStream.Close();
-                myReader.Close();
-
-                if (_teamopolisSurveyUrl != null)   // Did we find the survey URL?
-                    TeamopolisSurveyResponders();   // If so, go build a list of responders
-
+                    _teamopolisAvailablePlayers = AvailablePlayerFileIO.Instance.ReadAvailablePlayers();
+                }
+                catch (AvailablePlayerFileIOException ex)
+                {
+                    Console.WriteLine($"Error reading file of available players: {ex.Message}");
+                }
             }
-            catch (WebException ex)
+            else
             {
-                Console.WriteLine($"Error opening Teamopolis URL: {ex.Message}");
+                var webClient = new WebClient(); // For communicating with the Teamopolis site
+
+                // Open a stream to point to the data stream coming from the Teamopolis Web resource.
+                try
+                {
+                    Stream myStream = webClient.OpenRead(_teamopolisUrl);
+                    StreamReader myReader = new StreamReader(myStream);
+
+                    //Console.WriteLine("Retrieving Teamopolis survey responders.");
+                    string pageLine;
+                    do
+                    {
+                        // Get a line of source text from the HTML file
+                        pageLine = myReader.ReadLine();
+                        // Check to see whether it contains the survey URL
+                        if (pageLine != null)
+                            _teamopolisSurveyUrl = TeamopolisSurveyUrl(pageLine);
+
+                    } while (pageLine != null && _teamopolisSurveyUrl == null);
+
+                    myStream.Close();
+                    myReader.Close();
+
+                    if (_teamopolisSurveyUrl != null)   // Did we find the survey URL?
+                        TeamopolisSurveyResponders();   // If so, go build a list of responders
+
+                    // Now that we have the list locally, in memory, write it to a local file
+                    AvailablePlayerFileIO.Instance.WriteAvailablePlayers(_teamopolisAvailablePlayers);
+                }
+                catch (WebException ex)
+                {
+                    Console.WriteLine($"Error opening Teamopolis URL: {ex.Message}");
+                }
             }
         }
     }
