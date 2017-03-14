@@ -122,15 +122,22 @@ namespace Hammertime
 
         // =====================================================
         //Update statement
-        public bool Update()
+        public bool Update(string mySqlQuery)
         // =====================================================
         {
             bool updateStatus = false;
 
             if (OpenConnection() == true)
             {
-
+                //Create Command
+                MySqlCommand cmd = new MySqlCommand(mySqlQuery, _connection);
+                // Execute the UPDATE
+                int affectedRows = cmd.ExecuteNonQuery();
+                // Finished with the command
                 CloseConnection();
+
+                if (affectedRows == 1)
+                    updateStatus = true;
             }
 
             return updateStatus;

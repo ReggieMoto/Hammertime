@@ -38,6 +38,7 @@ namespace Hammertime
     {
         // ==============================================================
         public static bool ReadSurveyResults { get; set; }
+        public static bool SaveTeams { get; set; }
         // ==============================================================
         private static string Uid { get; set; }
         private static string Password { get; set; }
@@ -136,8 +137,8 @@ namespace Hammertime
                     else if (arg == "--SaveTeams")
                     {
                         Console.WriteLine();
-                        if (HockeyTeam.SaveTeams() == false)
-                            throw (new HammerMainException("Error: Currently unsupported command."));
+                        ReadSurveyResults = false;
+                        SaveTeams = true;
                     }
                     else
                     {
@@ -170,6 +171,9 @@ namespace Hammertime
                 // Get user credentials
                 GetCredentials();
 
+                // Temporary
+                //HammertimeServer.Instance.AsyncListener();
+
                 // For now default to our Teamopolis database
                 Server   = "localhost";
                 Database = "mondaynighthockey";
@@ -189,6 +193,9 @@ namespace Hammertime
 
                         white.PrintHomeTeamRoster();
                         dark.PrintVisitingTeamRoster();
+
+                        if (SaveTeams == true && HockeyTeam.SaveTeams() == false)
+                            throw (new HammerMainException("Error: Unable to update database with this week's team assignments."));
                     }
                     catch (TeamBalancerException ex)
                     {

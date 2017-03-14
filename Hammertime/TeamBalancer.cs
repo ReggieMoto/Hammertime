@@ -16,6 +16,8 @@
 // is obtained David Hammond.
 // ==============================================================
 
+using System;
+
 namespace Hammertime
 {
     public class TeamBalancerException : System.Exception
@@ -60,35 +62,44 @@ namespace Hammertime
             else
                 teamInstance = VisitorTeam.Instance;
 
-            //Console.WriteLine($"Entering AddLowerSkillPlayer: scoreDifferential = {scoreDifferential}");
+            Console.WriteLine($"Entering AddLowerSkillPlayer: scoreDifferential = {scoreDifferential}");
 
             if (scoreDifferential <= 1)
             {
-                //Console.WriteLine("AddLowerSkillLevelPlayer: Try Level D");
+                Console.WriteLine("AddLowerSkillLevelPlayer: scoreDifferential <= 1");
                 addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
+                if (addedPlayerToRoster == false)
+                    addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
+                if (addedPlayerToRoster == false)
+                    addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
+                if (addedPlayerToRoster == false)
+                    addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
             }
-
-            if (addedPlayerToRoster == false && scoreDifferential == 2)
+            else if (scoreDifferential == 2)
             {
-                //Console.WriteLine("AddLowerSkillLevelPlayer: Try Level C");
+                Console.WriteLine("AddLowerSkillLevelPlayer: scoreDifferential == 2");
                 addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
                 if (addedPlayerToRoster == false)
+                    addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
+                if (addedPlayerToRoster == false)
                     addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
+                if (addedPlayerToRoster == false)
+                    addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
             }
-
-            if (addedPlayerToRoster == false && scoreDifferential == 3)
+            else if (scoreDifferential == 3)
             {
-                //Console.WriteLine("AddLowerSkillLevelPlayer: Try Level B");
+                Console.WriteLine("AddLowerSkillLevelPlayer: scoreDifferential == 3");
                 addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
+                if (addedPlayerToRoster == false)
+                    addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
                 if (addedPlayerToRoster == false)
                     addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
                 if (addedPlayerToRoster == false)
                     addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
             }
-
-            if (addedPlayerToRoster == false && scoreDifferential == 4)
+            else // (scoreDifferential == 4)
             {
-                //Console.WriteLine("AddLowerSkillLevelPlayer: Try Level A");
+                Console.WriteLine("AddLowerSkillLevelPlayer: scoreDifferential == 4");
                 addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
                 if (addedPlayerToRoster == false)
                     addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
@@ -99,6 +110,7 @@ namespace Hammertime
             }
 
             //Console.WriteLine($"addedPlayerToRoster: {addedPlayerToRoster}");
+            Console.WriteLine();
             return addedPlayerToRoster;
         }
 
@@ -114,12 +126,12 @@ namespace Hammertime
             else
                 teamInstance = VisitorTeam.Instance;
 
-            //Console.WriteLine($"Entering AddHigherSkillPlayer: scoreDifferential = {scoreDifferential}");
+            Console.WriteLine($"Entering AddHigherSkillPlayer: scoreDifferential = {scoreDifferential}");
 
             // Check for Level A
-            if (teamCompositionDiff[0] != 0)
+            if (teamCompositionDiff[0] != 0) // Looking for an 'A' level player
             {
-                //Console.WriteLine("AddHighSkillLevelPlayer: Check for Level A");
+                Console.WriteLine($"AddHighSkillLevelPlayer: teamCompositionDiff[A] == {teamCompositionDiff[0]}");
                 addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
                 if (addedPlayerToRoster == false)
                     addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
@@ -130,10 +142,12 @@ namespace Hammertime
             }
 
             // Check for Level B
-            else if (teamCompositionDiff[1] != 0)
+            else if (teamCompositionDiff[1] != 0) // Looking for a 'B' level or better player
             {
-                //Console.WriteLine("AddHighSkillLevelPlayer: Check for Level B");
+                Console.WriteLine($"AddHighSkillLevelPlayer: teamCompositionDiff[B] == {teamCompositionDiff[1]}");
                 addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
+                if (addedPlayerToRoster == false)
+                    addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
                 if (addedPlayerToRoster == false)
                     addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
                 if (addedPlayerToRoster == false)
@@ -141,10 +155,14 @@ namespace Hammertime
             }
 
             // Check for Level C
-            else if (teamCompositionDiff[2] != 0)
+            else if (teamCompositionDiff[2] != 0) // Looking for a 'C' level or better player
             {
-                //Console.WriteLine("AddHighSkillLevelPlayer: Check for Level C");
+                Console.WriteLine($"AddHighSkillLevelPlayer: teamCompositionDiff[C] == {teamCompositionDiff[2]}");
                 addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
+                if (addedPlayerToRoster == false)
+                    addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
+                if (addedPlayerToRoster == false)
+                    addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
                 if (addedPlayerToRoster == false)
                     addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
             }
@@ -152,11 +170,18 @@ namespace Hammertime
             // Check for Level D
             else // (teamCompositionDiff[3] != 0)
             {
-                //Console.WriteLine("AddHighSkillLevelPlayer: Check for Level D");
+                Console.WriteLine($"AddHighSkillLevelPlayer: teamCompositionDiff[D] == {teamCompositionDiff[3]}");
                 addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
+                if (addedPlayerToRoster == false)
+                    addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
+                if (addedPlayerToRoster == false)
+                    addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
+                if (addedPlayerToRoster == false)
+                    addedPlayerToRoster = teamInstance.AddASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
             }
 
             //Console.WriteLine($"addedPlayerToRoster: {addedPlayerToRoster}");
+            Console.WriteLine();
             return addedPlayerToRoster;
         }
 
@@ -214,7 +239,10 @@ namespace Hammertime
                 // Booleans to keep track of whether players have been added or not
                 bool addedToHome = false, addedToVisitor = false;
 
-                if (home.PlayerCount <= visitor.PlayerCount)
+                Console.WriteLine($"Home team player count: {home.PlayerCount}");
+                Console.WriteLine($"Visitor team player count: {visitor.PlayerCount}");
+
+                if (home.PlayerCount < visitor.PlayerCount)
                 {
                     // Add a player to the home team
                     if (visitor.TeamScore >= home.TeamScore)
@@ -228,7 +256,7 @@ namespace Hammertime
                         addedToHome = AddLowerSkillPlayer(home, home.TeamScore - visitor.TeamScore);
                     }
                 }
-                else // (home.PlayerCount > visitor.PlayerCount)
+                else if (home.PlayerCount > visitor.PlayerCount)
                 {
                     // Add a player to the visitor team
                     if (home.TeamScore >= visitor.TeamScore)
@@ -241,6 +269,29 @@ namespace Hammertime
                         // Add lowest player available
                         addedToVisitor = AddLowerSkillPlayer(visitor, visitor.TeamScore - home.TeamScore);
                     }
+                }
+                else // (home.PlayerCount == visitor.PlayerCount)
+                {
+                    // Add a player to the home team
+                    if (visitor.TeamScore > home.TeamScore)
+                    {
+                        // Added highest player available
+                        addedToHome = AddHigherSkillPlayer(home, SkillDifference(visitor.TeamComposition, home.TeamComposition), visitor.TeamScore - home.TeamScore);
+                    }
+                    else if (home.TeamScore > visitor.TeamScore)
+                    {
+                        // Added highest player available
+                        addedToHome = AddHigherSkillPlayer(visitor, SkillDifference(home.TeamComposition, visitor.TeamComposition), home.TeamScore - visitor.TeamScore);
+                    }
+                    else // (home.TeamScore == visitor.TeamScore)
+                    {
+                        // Add lowest players available
+                        Console.Write("Home team: ");
+                        addedToHome = AddLowerSkillPlayer(home, 0);
+                        Console.Write("Visitor team: ");
+                        addedToVisitor = AddLowerSkillPlayer(visitor, 0);
+                    }
+
                 }
                 //Console.WriteLine();
                 if (addedToHome == false && addedToVisitor == false)

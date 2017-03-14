@@ -105,21 +105,21 @@ namespace Hammertime
 
             _homeRoster = new ArrayList();
 
-            // The home team is the "white" team
-            // Look to see which which full-time players were on the visiting "black" team last week and make them the home "white" team this week
+            // The home team is the "black" team
+            // Look to see which which full-time players were on the visiting "white" team last week and make them the home "black" team this week
 
             foreach (HockeyPlayer player in _availableFullTimePlayers)
             {
                 // First get available full-time players associated with either Ben or Barry
                 if ((player.AssignedToTeam == false) &&
                     (player.PlayerTeam != "Unaffiliated") &&    // Not unaffiliated means affiliated with either Ben or Barry
-                    (player.PlayerLastWeek == "Black"))         // Last week player was on the visiting "black" team
+                    (player.PlayerLastWeek == "White"))         // Last week player was on the visiting "white" team
 
                 {
                     if (player.PlayerPos != "Goalie")       // Save Goalies to the end
                     {
                         player.AssignedToTeam = true;
-                        player.PlayerLastWeek = "White";    // This week the player will be on the home "white" team
+                        player.PlayerLastWeek = "Black";    // This week the player will be on the home "black" team
                         _homeRoster.Add(player);
                     }
                 }

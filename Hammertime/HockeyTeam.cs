@@ -61,22 +61,24 @@ namespace Hammertime
         public static bool SaveTeams()
         // ==============================================================
         {
-            bool teamsSaved = false;
-            Console.WriteLine("Save teams: <Coming soon>");
+            bool playerUpdated = false;
 
-            if (teamsSaved == true)
+            DbConnection connection = DbConnection.getInstance();
+
+            var query = from HockeyPlayer player in _availableFullTimePlayers select player;
+            foreach (HockeyPlayer player in query)
             {
-                DbConnection connection = DbConnection.getInstance();
-                var query = from HockeyPlayer player in _availableFullTimePlayers
-                            select player;
+                string mySqlQuery = $"update mondaynighthockey.players set player_last_wk=\"{player.PlayerLastWeek}\" where player_id={player.PlayerID}";
+                playerUpdated = connection.Update(mySqlQuery);
 
-                foreach (HockeyPlayer player in query)
-                {
-                    connection.Update();
-                }
+                //Console.WriteLine(mySqlQuery);
+                //Console.WriteLine($"Player ID {player.PlayerID} Updated: {playerUpdated}");
+                //Console.WriteLine();
+
+                if (playerUpdated == false) break;
             }
 
-            return teamsSaved;
+            return playerUpdated;
         }
 
         // ==============================================================
@@ -187,11 +189,11 @@ namespace Hammertime
 
             if (Location == Residence.Home)
             {
-                teamId = "Home Team (White)";
+                teamId = "Home Team (Black)";
             }
             else
             {
-                teamId = "Visiting Team (Dark)";
+                teamId = "Visiting Team (White)";
 
             }
 
@@ -267,6 +269,11 @@ namespace Hammertime
                     goalieAdded = true;
                     player.AssignedToTeam = true;
                     teamRoster.Add(player);
+
+                    if (Location == Residence.Home)
+                        player.PlayerLastWeek = "Black";
+                    else
+                        player.PlayerLastWeek = "White";
                 }
 
                 if (goalieAdded) break;
@@ -324,6 +331,11 @@ namespace Hammertime
                     playerAdded = true;
                     player.AssignedToTeam = true;
                     teamRoster.Add(player);
+
+                    if (Location == Residence.Home)
+                        player.PlayerLastWeek = "Black";
+                    else
+                        player.PlayerLastWeek = "White";
                 }
 
                 if (playerAdded) break;
