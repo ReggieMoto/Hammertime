@@ -61,7 +61,7 @@ namespace Hammertime
         public static bool SaveTeams()
         // ==============================================================
         {
-            bool playerUpdated = false;
+            bool teamsSaved = false;
 
             DbConnection connection = DbConnection.getInstance();
 
@@ -69,16 +69,14 @@ namespace Hammertime
             foreach (HockeyPlayer player in query)
             {
                 string mySqlQuery = $"update mondaynighthockey.players set player_last_wk=\"{player.PlayerLastWeek}\" where player_id={player.PlayerID}";
-                playerUpdated = connection.Update(mySqlQuery);
-
-                //Console.WriteLine(mySqlQuery);
-                //Console.WriteLine($"Player ID {player.PlayerID} Updated: {playerUpdated}");
-                //Console.WriteLine();
-
-                if (playerUpdated == false) break;
+                teamsSaved = connection.Update(mySqlQuery);
+                if (teamsSaved == false) break;
             }
 
-            return playerUpdated;
+            if (teamsSaved == true)
+                Console.WriteLine("\nTeams written to the database.\n");
+
+            return teamsSaved;
         }
 
         // ==============================================================
