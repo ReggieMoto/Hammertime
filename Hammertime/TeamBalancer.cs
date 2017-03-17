@@ -210,6 +210,8 @@ namespace Hammertime
         }
 
         // ==============================================================
+        // Add goalies. Strong goalies to weaker teams.
+        // ==============================================================
         private void AddGoalies(HomeTeam home, VisitorTeam visitor)
         // ==============================================================
         {
@@ -340,6 +342,11 @@ namespace Hammertime
         }
 
         // ==============================================================
+        // This is the second pass final balancer.
+        // It attempts to balance the teams based upon score and
+        // numbers of players on each roster.
+        // NOTE: This is pre-goalie. No goalies are added here.
+        // ==============================================================
         public void FinalBalance(HomeTeam home, VisitorTeam visitor)
         // ==============================================================
         {
@@ -374,6 +381,12 @@ namespace Hammertime
             }
         }
 
+        // ==============================================================
+        // This is the first pass coarse balancer.
+        // It uses the difference in specific players' skill levels
+        // to work out team rosters, attempting to balance based on
+        // similar numbers of skilled players per team.
+        // NOTE: Goalies are added after the final balance.
         // ==============================================================
         public void Balance(HomeTeam home, VisitorTeam visitor)
         // ==============================================================
@@ -467,7 +480,8 @@ namespace Hammertime
             if ((home.PlayerCount != visitor.PlayerCount) ||
                 (home.TeamScore != visitor.TeamScore))
                 FinalBalance(home, visitor);
-
+            
+            // Final balancing has been done. Now add goalies.
             AddGoalies(home, visitor);
         }
     }

@@ -107,9 +107,11 @@ namespace Hammertime
         }
 
         // ==============================================================
-        private static void ParseCmdLineArgs(string[] args)
+        private static bool ParseCmdLineArgs(string[] args)
         // ==============================================================
         {
+            bool haltOnHelp = false;
+
             if (args.Length == 0)
             {
                 // Just run the program
@@ -127,6 +129,7 @@ namespace Hammertime
                     {
                         Console.WriteLine();
                         CommandLineHelp();
+                        haltOnHelp = true;
                     }
                     else if (arg == "--AddNewPlayer")
                     {
@@ -156,6 +159,8 @@ namespace Hammertime
                     }
                 }
             }
+
+            return haltOnHelp;
         }
 
         // ==============================================================
@@ -166,7 +171,8 @@ namespace Hammertime
             try
             {
                 // What does the user want to do?
-                ParseCmdLineArgs(args);
+                if (ParseCmdLineArgs(args) == true)
+                    return;
 
                 // Get user credentials
                 GetCredentials();
