@@ -81,6 +81,43 @@ namespace Hammertime
         }
 
         // ==============================================================
+        public override void AddAPlayer(HockeyPlayer hockeyPlayer)
+        // ==============================================================
+        {
+            //Console.WriteLine("AddAPlayer for the visitor team");
+            _visitorRoster.Add(hockeyPlayer);
+            hockeyPlayer.PlayerLastWeek = "White";    // This week the player will be on the home "black" team
+        }
+
+        // ==============================================================
+        public override void RemoveAPlayer(HockeyPlayer hockeyPlayer)
+        // ==============================================================
+        {
+            //Console.WriteLine("RemoveAPlayer from the visitor team");
+            _visitorRoster.Remove(hockeyPlayer);
+        }
+
+        // ==============================================================
+        public override HockeyPlayer GetASkillPlayer(HockeyPlayer.PlayerSkill skillLevel)
+        // ==============================================================
+        {
+            HockeyPlayer skillPlayer = null;
+
+            foreach (HockeyPlayer player in _visitorRoster)
+            {
+                if ((player.PlayerTeam == "Unaffiliated") &&
+                    (player.PlayerPos != "Goalie") &&
+                    (player.Level == skillLevel))
+                {
+                    skillPlayer = player;
+                    break;
+                }
+            }
+
+            return skillPlayer;
+        }
+
+        // ==============================================================
         public override bool AddAGoalie(bool strongerTeam)
         // ==============================================================
         {

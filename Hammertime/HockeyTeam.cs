@@ -243,7 +243,15 @@ namespace Hammertime
         }
 
         // ==============================================================
-        // Add a skill level player to the roster if one is available.
+        // Add/Remove players from the roster
+        // ==============================================================
+        public abstract HockeyPlayer GetASkillPlayer(HockeyPlayer.PlayerSkill skillLevel);
+        public abstract void AddAPlayer(HockeyPlayer hockeyPlayer);     // Provided in team classes
+        public abstract void RemoveAPlayer(HockeyPlayer hockeyPlayer);  // Provided in team classes
+        // ==============================================================
+
+        // ==============================================================
+        // Add a goalie to the roster if one is available.
         // First try the available full time roster players.
         // If nothing available try the available sub players.
         // Return true if added; false if not added.
