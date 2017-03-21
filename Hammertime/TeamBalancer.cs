@@ -280,7 +280,7 @@ namespace Hammertime
                     player = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
 
                 // Perform the swap if a player is available
-                if (player == null)
+                if (player != null)
                 {
                     weak.AddAPlayer(player);
                     strong.RemoveAPlayer(player);
@@ -333,7 +333,7 @@ namespace Hammertime
                     player = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
 
                 // Perform the swap if a player is available
-                if (player == null)
+                if (player != null)
                 {
                     weak.AddAPlayer(player);
                     strong.RemoveAPlayer(player);
