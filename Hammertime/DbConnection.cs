@@ -115,9 +115,27 @@ namespace Hammertime
             }
         }
 
+        // =====================================================
         //Insert statement
-        public void Insert()
+        public bool Insert(string mySqlQuery)
+        // =====================================================
         {
+            bool insertStatus = false;
+
+            if (OpenConnection() == true)
+            {
+                //Create Command
+                MySqlCommand cmd = new MySqlCommand(mySqlQuery, _connection);
+                // Execute the INSERT
+                int affectedRows = cmd.ExecuteNonQuery();
+                // Finished with the command
+                CloseConnection();
+
+                if (affectedRows == 1)
+                    insertStatus = true;
+            }
+
+            return insertStatus;
         }
 
         // =====================================================
@@ -143,9 +161,27 @@ namespace Hammertime
             return updateStatus;
         }
 
+        // =====================================================
         //Delete statement
-        public void Delete()
+        public bool Delete(string mySqlQuery)
+        // =====================================================
         {
+            bool updateStatus = false;
+
+            if (OpenConnection() == true)
+            {
+                //Create Command
+                MySqlCommand cmd = new MySqlCommand(mySqlQuery, _connection);
+                // Execute the DELETE
+                int affectedRows = cmd.ExecuteNonQuery();
+                // Finished with the command
+                CloseConnection();
+
+                if (affectedRows == 1)
+                    updateStatus = true;
+            }
+
+            return updateStatus;
         }
 
         // =====================================================

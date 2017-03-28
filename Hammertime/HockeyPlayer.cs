@@ -17,6 +17,7 @@
 // ==============================================================
 
 using System;
+using System.Text;
 
 namespace Hammertime
 {
@@ -94,13 +95,6 @@ namespace Hammertime
                     PlayerScore = PlayerValue.Level_D;
                     break;
             }
-        }
-
-        public static bool NewPlayer()
-        {
-            bool newPlayerAdded = false;
-            Console.WriteLine("Add New Player: <Coming soon>");
-            return newPlayerAdded;
         }
 
         public int PlayerID { get; set; }

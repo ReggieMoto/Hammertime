@@ -85,6 +85,9 @@ namespace Hammertime
                     sb.Append(cki.KeyChar);
                 }
 
+                if ((cki.Key == ConsoleKey.Backspace) && (sb.Length >= 1))
+                    sb.Length--;
+
             } while (cki.Key != ConsoleKey.Enter);
 
             Password = sb.ToString();
@@ -96,6 +99,216 @@ namespace Hammertime
         }
 
         // ==============================================================
+        private static string getKbdInput()
+        // ==============================================================
+        {
+            ConsoleKeyInfo cki;
+            StringBuilder sb = new StringBuilder();
+            string inputString = null;
+
+            do
+            {
+                cki = Console.ReadKey(false);
+
+                if (cki.Key == ConsoleKey.Escape)
+                {
+                    inputString = null;
+                    Console.WriteLine();
+                    Console.WriteLine();
+                    return inputString;
+                }
+
+                if ((cki.KeyChar >= 'A' && cki.KeyChar <= 'Z') ||
+                    (cki.KeyChar >= 'a' && cki.KeyChar <= 'z'))
+                {
+                    sb.Append(cki.KeyChar);
+                }
+
+                if ((cki.Key == ConsoleKey.Backspace) && (sb.Length >= 1))
+                    sb.Length--;
+
+            } while (cki.Key != ConsoleKey.Enter);
+
+            inputString = sb.ToString();
+
+            Console.WriteLine();
+
+            return inputString;
+        }
+
+        // ==============================================================
+        private static bool DeletePlayer()
+        // ==============================================================
+        {
+            // delete from mondaynighthockey.players where player_id=;
+
+            bool playerDeleted = false;
+
+            // Get user credentials
+            GetCredentials();
+
+            // Temporary
+            //HammertimeServer.Instance.AsyncListener();
+
+            // For now default to our Teamopolis database
+            Server = "localhost";
+            Database = "mondaynighthockey";
+
+            // Log in to server
+            DbConnection dbConnection = DbConnection.getInstance(Server, Database, Uid, Password);
+
+            if (dbConnection.Connected)
+            {
+                string firstName = null;
+                string lastName = null;
+
+                do
+                {
+                    Console.Write("Player's first name: ");
+                    firstName = getKbdInput();
+                } while (firstName == null);
+
+                do
+                {
+                    Console.Write("Player's last name: ");
+                    lastName = getKbdInput();
+                } while (lastName == null);
+
+                string player = firstName + " " + lastName;
+
+                HockeyPlayer dbPlayer = dbConnection.SelectPlayer(player);
+                if (dbPlayer != null)
+                {
+                    Console.WriteLine($"Player {player} found in the db.");
+                    string deleteThisPlayer = null;
+                    do
+                    {
+                        Console.Write("Delete this player? (Y/N) ");
+                        deleteThisPlayer = getKbdInput();
+                    } while ((deleteThisPlayer != "Y") &&
+                             (deleteThisPlayer != "N"));
+
+                    if (deleteThisPlayer == "Y")
+                    {
+                        Console.WriteLine($"delete from mondaynighthockey.players where player_id={dbPlayer.PlayerID};");
+                        Console.WriteLine($"Player {player} deleted from db.");
+                        playerDeleted = true;
+                    }
+                }
+                else
+                    Console.WriteLine($"Player {player} wasn't found in the db.");
+            }
+
+            return playerDeleted;
+        }
+
+        // ==============================================================
+        private static bool AddNewPlayer()
+        // ==============================================================
+        {
+            bool newPlayerAdded = true;
+            string firstName = null;
+            string lastName = null;
+            string position = null;
+            string skillLevel = null;
+            string goalie = null;
+            string playerType = null;
+            string anotherPlayer = null;
+
+            // Get user credentials
+            GetCredentials();
+
+            // Temporary
+            //HammertimeServer.Instance.AsyncListener();
+
+            // For now default to our Teamopolis database
+            Server = "localhost";
+            Database = "mondaynighthockey";
+
+            // Log in to server
+            DbConnection dbConnection = DbConnection.getInstance(Server, Database, Uid, Password);
+
+            if (dbConnection.Connected)
+            {
+                do
+                {
+                    do
+                    {
+                        Console.Write("Player's first name: ");
+                        firstName = getKbdInput();
+                    } while (firstName == null);
+
+                    do
+                    {
+                        Console.Write("Player's last name: ");
+                        lastName = getKbdInput();
+                    } while (lastName == null);
+
+                    do
+                    {
+                        Console.Write("Player's skill level (A/B/C/D): ");
+                        skillLevel = getKbdInput();
+                    } while ((skillLevel != "A") &&
+                             (skillLevel != "B") &&
+                             (skillLevel != "C") &&
+                             (skillLevel != "D"));
+
+                    do
+                    {
+                        Console.Write("Player's position (D, F, G): ");
+                        position = getKbdInput();
+                    } while ((position != "D") &&
+                             (position != "F") &&
+                             (position != "G"));
+
+                    if (position == "D") position = "Defense";
+                    else if (position == "F") position = "Forward";
+                    else position = "Goalie";
+
+                    do
+                    {
+                        Console.Write("If not a goalie can the player also play as a goalie? (Y/N) ");
+                        goalie = getKbdInput();
+                    } while ((goalie != "Y") &&
+                             (goalie != "N"));
+
+                    do
+                    {
+                        Console.Write("Is the player full time or a sub? (F/S) ");
+                        playerType = getKbdInput();
+                    } while ((playerType != "F") &&
+                             (playerType != "S"));
+
+                    Console.WriteLine();
+                    Console.WriteLine($"About to add new player {firstName} {lastName} to the db.");
+                    Console.WriteLine($"{firstName} is a level {skillLevel} player who plays {position}.");
+                    Console.WriteLine();
+                    string mySqlQuery = $"insert into mondaynighthockey.players (player_last_name, player_first_name, player_level, player_position, player_goalie, player_type, player_team, player_last_wk) values (\"{lastName}\", \"{firstName}\", '{skillLevel[0]}', \"{position}\", '{goalie[0]}', \"{playerType}\", \"Unaffiliated\", \"Zed\")";
+                    Console.WriteLine(mySqlQuery);
+                    //newPlayerAdded = dbConnection.Insert(mySqlQuery);
+                    Console.WriteLine();
+
+                    if (newPlayerAdded)
+                    {
+                        do
+                        {
+                            Console.Write("Add another player? (Y/N) ");
+                            anotherPlayer = getKbdInput();
+                        } while ((anotherPlayer != "Y") &&
+                                 (anotherPlayer != "N"));
+                    }
+
+                    Console.WriteLine();
+
+                } while ((newPlayerAdded) && (anotherPlayer == "Y"));
+
+                Console.WriteLine();
+            }
+
+            return newPlayerAdded;
+        }
+
+        // ==============================================================
         private static void CommandLineHelp()
         // ==============================================================
         {
@@ -103,6 +316,7 @@ namespace Hammertime
             Console.WriteLine("\t--Help: These instructions.");
             Console.WriteLine("\t--ReadSurveyResults=true/false: default is true.");
             Console.WriteLine("\t--AddNewPlayer: Opens a command line dialog for adding a new player to the database.");
+            Console.WriteLine("\t--DeletePlayer: Opens a command line dialog for removing a player from the database.");
             Console.WriteLine("\t--SaveTeams: Writes team assignments to the database.");
         }
 
@@ -110,7 +324,7 @@ namespace Hammertime
         private static bool ParseCmdLineArgs(string[] args)
         // ==============================================================
         {
-            bool haltOnHelp = false;
+            bool cmdLineHalt = false;
 
             if (args.Length == 0)
             {
@@ -129,13 +343,21 @@ namespace Hammertime
                     {
                         Console.WriteLine();
                         CommandLineHelp();
-                        haltOnHelp = true;
+                        cmdLineHalt = true;
                     }
                     else if (arg == "--AddNewPlayer")
                     {
                         Console.WriteLine();
-                        if (HockeyPlayer.NewPlayer() == false)
-                            throw (new HammerMainException("Error: Currently unsupported command."));
+                        if (AddNewPlayer() == false)
+                            throw (new HammerMainException("Error: Couldn't add the new player."));
+                        cmdLineHalt = true;
+                    }
+                    else if (arg == "--DeletePlayer")
+                    {
+                        Console.WriteLine();
+                        if (DeletePlayer() == false)
+                            throw (new HammerMainException("Error: Couldn't delete the player."));
+                        cmdLineHalt = true;
                     }
                     else if (arg == "--SaveTeams")
                     {
@@ -160,7 +382,7 @@ namespace Hammertime
                 }
             }
 
-            return haltOnHelp;
+            return cmdLineHalt;
         }
 
         // ==============================================================
