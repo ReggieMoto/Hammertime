@@ -137,6 +137,66 @@ namespace Hammertime
         }
 
         // ==============================================================
+        private static bool PlayerAttrs()
+        // ==============================================================
+        {
+            // delete from mondaynighthockey.players where player_id=;
+
+            bool playerFound = false;
+
+            // Get user credentials
+            GetCredentials();
+
+            // Temporary
+            //HammertimeServer.Instance.AsyncListener();
+
+            // For now default to our Teamopolis database
+            Server = "localhost";
+            Database = "mondaynighthockey";
+
+            // Log in to server
+            DbConnection dbConnection = DbConnection.getInstance(Server, Database, Uid, Password);
+
+            if (dbConnection.Connected)
+            {
+                string firstName = null;
+                string lastName = null;
+
+                do
+                {
+                    Console.Write("Player's first name: ");
+                    firstName = getKbdInput();
+                } while (firstName == null);
+
+                do
+                {
+                    Console.Write("Player's last name: ");
+                    lastName = getKbdInput();
+                } while (lastName == null);
+
+                string player = firstName + " " + lastName;
+
+                HockeyPlayer dbPlayer = dbConnection.SelectPlayer(player);
+                if (dbPlayer != null)
+                {
+                    playerFound = true;
+                    Console.WriteLine($"Player {player}:");
+                    Console.WriteLine($"\tDB ID: {dbPlayer.PlayerID}");
+                    Console.WriteLine($"\tSkill level: {dbPlayer.Level}");
+                    Console.WriteLine($"\tPosition: {dbPlayer.PlayerPos}");
+                    Console.WriteLine($"\tCan play goalie: {dbPlayer.Goalie}");
+                    Console.WriteLine($"\tFulltime or sub: {dbPlayer.PlayerType}");
+                    Console.WriteLine($"\tTeam affiliation: {dbPlayer.PlayerTeam}");
+                    Console.WriteLine($"\tLast week jersey color: {dbPlayer.PlayerLastWeek}");
+                }
+                else
+                    Console.WriteLine($"Player {player} wasn't found in the db.");
+            }
+
+            return playerFound;
+        }
+
+        // ==============================================================
         private static bool DeletePlayer()
         // ==============================================================
         {
@@ -317,6 +377,7 @@ namespace Hammertime
             Console.WriteLine("\t--ReadSurveyResults=true/false: default is true.");
             Console.WriteLine("\t--AddNewPlayer: Opens a command line dialog for adding a new player to the database.");
             Console.WriteLine("\t--DeletePlayer: Opens a command line dialog for removing a player from the database.");
+            Console.WriteLine("\t--PlayerAttrs: Opens a command line dialog to search for a player and return that player's attributes.");
             Console.WriteLine("\t--SaveTeams: Writes team assignments to the database.");
         }
 
@@ -357,6 +418,13 @@ namespace Hammertime
                         Console.WriteLine();
                         if (DeletePlayer() == false)
                             throw (new HammerMainException("Error: Couldn't delete the player."));
+                        cmdLineHalt = true;
+                    }
+                    else if (arg == "--PlayerAttrs")
+                    {
+                        Console.WriteLine();
+                        if (PlayerAttrs() == false)
+                            throw (new HammerMainException("Error: Couldn't retrieve the player's attributes."));
                         cmdLineHalt = true;
                     }
                     else if (arg == "--SaveTeams")
