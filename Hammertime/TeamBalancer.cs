@@ -396,8 +396,8 @@ namespace Hammertime
 
             // As long as either team has less than 10 players and there are more available players
             // Keep adding players. The team compositions and scores are factored in below.
-            while ((home.PlayerCount < 10 ||
-                visitor.PlayerCount < 10) &&
+            while ((home.PlayerCount < 11 ||
+                visitor.PlayerCount < 11) &&
                 moreAvailablePlayers == true &&
                 controlCounter++ <= 20) // Emergency runaway shutoff
             {

@@ -62,6 +62,9 @@ namespace Hammertime
         // =====================================================
         //  Read in the player profile page using the URL, extract
         //  the player's name from the page, and return it
+        //
+        // NOTE: WebClient does NOT work here.
+        // Will produce too many auto redirection errors
         // =====================================================
         private string SurveyResponderName(string url)
         // =====================================================
@@ -71,7 +74,6 @@ namespace Hammertime
             string firstSubStringPattern = "<td class=\"headlineSmText\">Name</td><td class=\"regText\">";
             string lastSubStringPattern = "</td>";
             string pageLine = null;
-
 
             // Open a stream to point to the data stream coming from the Teamopolis Player Profile Web resource.
             try
@@ -275,27 +277,12 @@ namespace Hammertime
             else
             {
                 var webClient = new WebClient(); // For communicating with the Teamopolis site
-
-                // Open a stream to point to the data stream coming from the Teamopolis Web resource.
                 try
                 {
-                    Stream myStream = webClient.OpenRead(_teamopolisUrl);
-                    StreamReader myReader = new StreamReader(myStream);
+                    String htmlPage = webClient.DownloadString(_teamopolisUrl);
 
-                    //Console.WriteLine("Retrieving Teamopolis survey responders.");
-                    string pageLine;
-                    do
-                    {
-                        // Get a line of source text from the HTML file
-                        pageLine = myReader.ReadLine();
-                        // Check to see whether it contains the survey URL
-                        if (pageLine != null)
-                            _teamopolisSurveyUrl = TeamopolisSurveyUrl(pageLine);
-
-                    } while (pageLine != null && _teamopolisSurveyUrl == null);
-
-                    myStream.Close();
-                    myReader.Close();
+                    if (htmlPage != null)
+                        _teamopolisSurveyUrl = TeamopolisSurveyUrl(htmlPage);
 
                     if (_teamopolisSurveyUrl != null)   // Did we find the survey URL?
                         TeamopolisSurveyResponders();   // If so, go build a list of responders
