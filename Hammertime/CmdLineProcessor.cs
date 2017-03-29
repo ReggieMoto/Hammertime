@@ -28,12 +28,26 @@ namespace Hammertime
     {
         string _message;
 
+        public enum ExceptionID
+        {
+            Benign,
+            TooManyArgs,
+            AddNewPlayer,
+            DeletePlayer,
+            PlayerAttrs,
+            SaveTeams,
+            ReadSurveyResults,
+            UnrecognizedArgs
+        };
+
         // ==============================================================
-        public CmdLineProcessorException(string message) : base(message)
+        public CmdLineProcessorException(ExceptionID exceptionId, string message) : base(message)
         // ==============================================================
         {
             _message = message;
-            CmdLineProcessor.getInstance().Help();
+
+            if (exceptionId == ExceptionID.TooManyArgs)
+                CmdLineProcessor.getInstance().Help();
         }
     }
 
@@ -132,7 +146,7 @@ namespace Hammertime
             }
             else if (args.Length > 1)
             {
-                throw (new HammerMainException("Error: Only one command line argument allowed."));
+                throw (new CmdLineProcessorException(CmdLineProcessorException.ExceptionID.TooManyArgs, "Error: Only one command line argument allowed."));
             }
             else
             {
@@ -148,21 +162,21 @@ namespace Hammertime
                     {
                         Console.WriteLine();
                         if (AddNewPlayer() == false)
-                            throw (new HammerMainException("Error: Couldn't add the new player."));
+                            throw (new CmdLineProcessorException(CmdLineProcessorException.ExceptionID.AddNewPlayer, "Error: Couldn't add the new player."));
                         cmdLineHalt = true;
                     }
                     else if (arg == "--DeletePlayer")
                     {
                         Console.WriteLine();
                         if (DeletePlayer() == false)
-                            throw (new HammerMainException("Error: Couldn't delete the player."));
+                            throw (new CmdLineProcessorException(CmdLineProcessorException.ExceptionID.DeletePlayer, "Error: Couldn't delete the player."));
                         cmdLineHalt = true;
                     }
                     else if (arg == "--PlayerAttrs")
                     {
                         Console.WriteLine();
                         if (PlayerAttrs() == false)
-                            throw (new HammerMainException("Error: Couldn't retrieve the player's attributes."));
+                            throw (new CmdLineProcessorException(CmdLineProcessorException.ExceptionID.PlayerAttrs, "Error: Couldn't retrieve the player's attributes."));
                         cmdLineHalt = true;
                     }
                     else if (arg == "--SaveTeams")
@@ -183,10 +197,13 @@ namespace Hammertime
                             else
                                 HammerMain.ReadSurveyResults = false;
                         }
-                        else throw (new HammerMainException("Error: Unsupported command line argument."));
+                        else throw (new CmdLineProcessorException(CmdLineProcessorException.ExceptionID.UnrecognizedArgs, "Error: Unsupported command line argument."));
                     }
                 }
             }
+
+            if (cmdLineHalt == true)
+                throw (new CmdLineProcessorException(CmdLineProcessorException.ExceptionID.Benign, ""));
 
             return cmdLineHalt;
         }

@@ -127,6 +127,7 @@ namespace Hammertime
             {
                 // What does the user want to do?
                 // Parse command line args
+                // If method returns true then stop any further processing.
                 CmdLineProcessor.getInstance().Parse(args);
 
                 // Temporary
