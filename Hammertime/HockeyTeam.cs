@@ -63,7 +63,7 @@ namespace Hammertime
         {
             bool teamsSaved = false;
 
-            DbConnection connection = DbConnection.getInstance();
+            DbConnection connection = HammerMainDb.getInstance();
 
             var query = from HockeyPlayer player in _availableFullTimePlayers select player;
             foreach (HockeyPlayer player in query)
@@ -389,12 +389,12 @@ namespace Hammertime
                 _availableFullTimePlayers = new ArrayList();
                 _availableSubPlayers = new ArrayList();
 
-                DbConnection myDbConnection = DbConnection.getInstance();
+                DbConnection myDbConnection = HammerMainDb.getInstance();
                 ArrayList _availablePlayers = TeamopolisReader.Instance.AvailablePlayers;
 
                 foreach (string player in _availablePlayers)
                 {
-                    HockeyPlayer dbPlayer = myDbConnection.SelectPlayer(player);
+                    HockeyPlayer dbPlayer = myDbConnection.Read(player);
                     if (dbPlayer != null)
                     {
                         if (dbPlayer.PlayerType == 'F')

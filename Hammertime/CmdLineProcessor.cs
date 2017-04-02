@@ -32,9 +32,12 @@ namespace Hammertime
         {
             Benign,
             TooManyArgs,
+            DbUnavailable,
             AddNewPlayer,
             DeletePlayer,
             PlayerAttrs,
+            BackupDb,
+            RestoreDb,
             SaveTeams,
             ReadSurveyResults,
             UnrecognizedArgs
@@ -72,14 +75,14 @@ namespace Hammertime
             return _cmdLineProcessor;
         }
 
+        // =====================================================
+        // Constructor
         private CmdLineProcessor()
+        // =====================================================
         {
-            ArrayList credentials = HammerMain.Credentials();
-
-            Uid      = (string)credentials[0];
-            Password = (string)credentials[1];
-            Server   = (string)credentials[2];
-            Database = (string)credentials[3];
+            // This is the default DB Server.
+            // This could get modified during argument parsing.
+            HammerMainDb.Server = DbConnection.Server.MySql;
         }
 
         // ==============================================================
@@ -126,15 +129,19 @@ namespace Hammertime
         {
             Console.WriteLine("Hammertime command line help:");
             Console.WriteLine("\t--Help: These instructions.");
+            Console.WriteLine("\t--MySQL: Using MySQL Server.");
+            Console.WriteLine("\t--MongoDb: Using MongoDb Server.");
             Console.WriteLine("\t--ReadSurveyResults=true/false: default is true.");
             Console.WriteLine("\t--AddNewPlayer: Opens a command line dialog for adding a new player to the database.");
             Console.WriteLine("\t--DeletePlayer: Opens a command line dialog for removing a player from the database.");
             Console.WriteLine("\t--PlayerAttrs: Opens a command line dialog to search for a player and return that player's attributes.");
             Console.WriteLine("\t--SaveTeams: Writes team assignments to the database.");
+            Console.WriteLine("\t--Backup: Backup the database to the local disk.");
+            Console.WriteLine("\t--Restore: Restore the database from the local disk.");
         }
 
         // ==============================================================
-        public bool Parse(string[] args)
+        public void Parse(string[] args)
         // ==============================================================
         {
             bool cmdLineHalt = false;
@@ -144,7 +151,7 @@ namespace Hammertime
                 // Just run the program
                 HammerMain.ReadSurveyResults = true;   // Default
             }
-            else if (args.Length > 1)
+            else if (args.Length > 2)
             {
                 throw (new CmdLineProcessorException(CmdLineProcessorException.ExceptionID.TooManyArgs, "Error: Only one command line argument allowed."));
             }
@@ -157,6 +164,15 @@ namespace Hammertime
                         Console.WriteLine();
                         Help();
                         cmdLineHalt = true;
+                    }
+                    else if (arg == "--MongoDb")
+                    {
+                        HammerMainDb.Server = DbConnection.Server.MongoDb;
+                    }
+                    else if (arg == "--MySql")
+                    {
+                        // Already initialized as default
+                        HammerMainDb.Server = DbConnection.Server.MySql;
                     }
                     else if (arg == "--AddNewPlayer")
                     {
@@ -185,6 +201,20 @@ namespace Hammertime
                         HammerMain.ReadSurveyResults = false;
                         HammerMain.SaveTeams = true;
                     }
+                    else if (arg == "--Backup")
+                    {
+                        Console.WriteLine();
+                        if (BackupDb() == false)
+                            throw (new CmdLineProcessorException(CmdLineProcessorException.ExceptionID.BackupDb, "Error: Couldn't backup the database."));
+                        cmdLineHalt = true;
+                    }
+                    else if (arg == "--Restore")
+                    {
+                        Console.WriteLine();
+                        if (RestoreDb() == false)
+                            throw (new CmdLineProcessorException(CmdLineProcessorException.ExceptionID.RestoreDb, "Error: Couldn't restore the database."));
+                        cmdLineHalt = true;
+                    }
                     else
                     {
                         string pattern = "=";
@@ -204,9 +234,42 @@ namespace Hammertime
 
             if (cmdLineHalt == true)
                 throw (new CmdLineProcessorException(CmdLineProcessorException.ExceptionID.Benign, ""));
-
-            return cmdLineHalt;
         }
+
+        // ==============================================================
+        private static bool RestoreDb()
+        // ==============================================================
+        {
+            bool dbRestored = false;
+
+            // Log in to server
+            DbConnection dbConnection = HammerMainDb.getInstance(Server, Database, Uid, Password);
+
+            if (dbConnection.Connected())
+            {
+                dbRestored = dbConnection.Restore();
+            }
+
+            return dbRestored;
+        }
+
+        // ==============================================================
+        private static bool BackupDb()
+        // ==============================================================
+        {
+            bool dbBackedUp = false;
+
+            // Log in to server
+            DbConnection dbConnection = HammerMainDb.getInstance(Server, Database, Uid, Password);
+
+            if (dbConnection.Connected())
+            {
+                dbBackedUp = dbConnection.Backup();
+            }
+
+            return dbBackedUp;
+        }
+
         // ==============================================================
         private static bool PlayerAttrs()
         // ==============================================================
@@ -216,9 +279,9 @@ namespace Hammertime
             bool playerFound = false;
 
             // Log in to server
-            DbConnection dbConnection = DbConnection.getInstance(Server, Database, Uid, Password);
+            DbConnection dbConnection = HammerMainDb.getInstance(Server, Database, Uid, Password);
 
-            if (dbConnection.Connected)
+            if (dbConnection.Connected())
             {
                 string firstName = null;
                 string lastName = null;
@@ -237,7 +300,7 @@ namespace Hammertime
 
                 string player = firstName + " " + lastName;
 
-                HockeyPlayer dbPlayer = dbConnection.SelectPlayer(player);
+                HockeyPlayer dbPlayer = dbConnection.Read(player);
                 if (dbPlayer != null)
                 {
                     playerFound = true;
@@ -266,9 +329,9 @@ namespace Hammertime
             bool playerDeleted = false;
 
             // Log in to server
-            DbConnection dbConnection = DbConnection.getInstance(Server, Database, Uid, Password);
+            DbConnection dbConnection = HammerMainDb.getInstance(Server, Database, Uid, Password);
 
-            if (dbConnection.Connected)
+            if (dbConnection.Connected())
             {
                 string firstName = null;
                 string lastName = null;
@@ -287,7 +350,7 @@ namespace Hammertime
 
                 string player = firstName + " " + lastName;
 
-                HockeyPlayer dbPlayer = dbConnection.SelectPlayer(player);
+                HockeyPlayer dbPlayer = dbConnection.Read(player);
                 if (dbPlayer != null)
                 {
                     Console.WriteLine($"Player {player} found in the db.");
@@ -327,9 +390,9 @@ namespace Hammertime
             string anotherPlayer = null;
 
             // Log in to server
-            DbConnection dbConnection = DbConnection.getInstance(Server, Database, Uid, Password);
+            DbConnection dbConnection = HammerMainDb.getInstance(Server, Database, Uid, Password);
 
-            if (dbConnection.Connected)
+            if (dbConnection.Connected())
             {
                 do
                 {

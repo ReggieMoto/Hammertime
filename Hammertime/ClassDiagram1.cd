@@ -3,17 +3,17 @@
   <Class Name="Hammertime.HammerMain">
     <Position X="0.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>ACAAAAAAAEAAAAAAABAAAAAAAAAAEABCAABABgAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAEAAAAAAABAAAAAAAAAMFAACAAAABgAAAAA=</HashCode>
       <FileName>HammerMain.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hammertime.HockeyPlayer" Collapsed="true">
-    <Position X="7" Y="3.75" Width="1.5" />
+    <Position X="6.75" Y="4.25" Width="1.5" />
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAAEAAAkQACABAAAAAAEAgAAAIAAABAAAAAAAAAIg=</HashCode>
+      <HashCode>AAAAAEAAAEQACABAAAAAAEAgAAAIAAABAAAAAAAAAIg=</HashCode>
       <FileName>HockeyPlayer.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -27,21 +27,35 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>EAAIIAEAAAAAAAAAIBIAAAABgAEIAAgAACAQAAAAMAA=</HashCode>
+      <HashCode>EAAIIAEAAAAAAAAAJBIAAAABgAEIAAgAIKAQAAAAMAA=</HashCode>
       <FileName>HockeyTeam.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hammertime.HomeTeam">
     <Position X="2.5" Y="5.25" Width="2" />
+    <InheritanceLine Type="Hammertime.HockeyTeam" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="4.812" Y="6.035" />
+        <Point X="4.812" Y="7.375" />
+        <Point X="4.5" Y="7.375" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>AAAAIAAAAAACIAAAABAAAAABAAEAAAAAQCAQAAAEAAA=</HashCode>
+      <HashCode>AAAAIAAAAAACIAAABBAAAAABAAEAAAAAYKAQAAAEAAA=</HashCode>
       <FileName>HomeTeam.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hammertime.VisitorTeam">
     <Position X="5.25" Y="5.25" Width="2" />
+    <InheritanceLine Type="Hammertime.HockeyTeam" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="5" Y="6.035" />
+        <Point X="5" Y="7.375" />
+        <Point X="5.25" Y="7.375" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>AIAAIAAAAACAAAAAABAAAAABAAEAAAEAQCAQAAAAAAA=</HashCode>
+      <HashCode>AIAAIAAAAACAAAAABBAAAAABAAEAAAEAYKAQAAAAAAA=</HashCode>
       <FileName>VisitorTeam.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -60,21 +74,21 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Hammertime.TeamBalancer">
-    <Position X="7" Y="0.5" Width="1.5" />
+    <Position X="8.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AIAAgAAAAAAgAAAAAggAAAAAAAAAAAAAQAAAAAAAAAg=</HashCode>
+      <HashCode>AIAAgAAAACAgAABAAggAAAAAAAAAAAAAQAAAAAABAAg=</HashCode>
       <FileName>TeamBalancer.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hammertime.AvailablePlayerFileIO">
-    <Position X="12.25" Y="2.5" Width="1.5" />
+    <Position X="8.75" Y="4.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAgEAAAgAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAQ=</HashCode>
       <FileName>AvailablePlayerFileIO.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hammertime.HammertimeServer">
-    <Position X="9.25" Y="0.5" Width="1.5" />
+    <Position X="6.75" Y="0.5" Width="1.5" />
     <NestedTypes>
       <Class Name="Hammertime.HammertimeServer.StateObject" Collapsed="true">
         <TypeIdentifier>
@@ -85,6 +99,20 @@
     <TypeIdentifier>
       <HashCode>AAAACAAAACAIAAAAQEAAAAAAAAAAAAAQQAAAAAAAAAQ=</HashCode>
       <FileName>HammertimeServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hammertime.CmdLineProcessorException" Collapsed="true">
+    <Position X="0.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAA=</HashCode>
+      <FileName>CmdLineProcessor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hammertime.CmdLineProcessor" Collapsed="true">
+    <Position X="0.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABgABAAAEAIAABAABAIAAAAAAAAIAQCAAAAAgAAAAA=</HashCode>
+      <FileName>CmdLineProcessor.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />

@@ -49,6 +49,7 @@ namespace Hammertime
         }
 
         private static AvailablePlayerFileIO _instance;
+        private static string filenameSubdir = @"\Hammertime\";
         private static string _availablePlayersFilename = "availablePlayers.txt";
 
         // ==============================================================
@@ -62,32 +63,39 @@ namespace Hammertime
             ArrayList availablePlayers = new ArrayList();
 
             string filenamePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string fullyQualifiedFilename = filenamePath + "\\" + _availablePlayersFilename;
+            filenamePath += filenameSubdir;
+            string fullyQualifiedFilename = filenamePath + _availablePlayersFilename;
 
-
-            if (File.Exists(fullyQualifiedFilename))
+            if (Directory.Exists(filenamePath))
             {
-                try
+                if (File.Exists(fullyQualifiedFilename))
                 {
-                    // Create an instance of StreamReader to read from a file.
-                    // The using statement also closes the StreamReader.
-                    using (StreamReader sr = new StreamReader(fullyQualifiedFilename))
+                    try
                     {
-                        String line;
-                        // Read and display lines from the file until the end of
-                        // the file is reached.
-                        while ((line = sr.ReadLine()) != null)
-                            availablePlayers.Add(line);
+                        // Create an instance of StreamReader to read from a file.
+                        // The using statement also closes the StreamReader.
+                        using (StreamReader sr = new StreamReader(fullyQualifiedFilename))
+                        {
+                            String line;
+                            // Read and display lines from the file until the end of
+                            // the file is reached.
+                            while ((line = sr.ReadLine()) != null)
+                                availablePlayers.Add(line);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // Let the user know what went wrong.
+                        Console.Write("Error: The file could not be read: ");
+                        Console.WriteLine(e.Message);
                     }
                 }
-                catch (Exception e)
-                {
-                    // Let the user know what went wrong.
-                    Console.Write("Error: The file could not be read: ");
-                    Console.WriteLine(e.Message);
-                }
+                else throw (new AvailablePlayerFileIOException("File does not exist."));
             }
-            else throw (new AvailablePlayerFileIOException("File does not exist."));
+            else
+            {
+                Console.WriteLine($"Directory does not exist: {filenamePath}");
+            }
 
             return availablePlayers;
         }
@@ -97,31 +105,60 @@ namespace Hammertime
         // ==============================================================
         {
             string filenamePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string fullyQualifiedFilename = filenamePath + "\\" + _availablePlayersFilename;
+            filenamePath += filenameSubdir;
+            string fullyQualifiedFilename = filenamePath + _availablePlayersFilename;
+            DateTime localDate = DateTime.Now;
 
-            if (File.Exists(fullyQualifiedFilename))
+            string year = Convert.ToString(localDate.Year);
+            string month = Convert.ToString(localDate.Month);
+            if (month.Length == 1)
+                month = "0" + month;
+
+            string day = Convert.ToString(localDate.Day);
+            if (day.Length == 1)
+                day = "0" + day;
+
+            string hour = Convert.ToString(localDate.Hour);
+            if (hour.Length == 1)
+                hour = "0" + hour;
+
+            string minute = Convert.ToString(localDate.Minute);
+            if (minute.Length == 1)
+                minute = "0" + minute;
+
+            string second = Convert.ToString(localDate.Second);
+            if (second.Length == 1)
+                second = "0" + second;
+
+            string date = year + month + day + "_" + hour + minute + second + "_";
+
+            if (Directory.Exists(filenamePath))
             {
-                // Rename the old file
-                if (File.Exists(fullyQualifiedFilename + ".old"))
-                    File.Delete(fullyQualifiedFilename + ".old");
-
-                File.Copy(fullyQualifiedFilename, fullyQualifiedFilename+".old");
-            }
-
-            try
-            {
-                // Write the list of available players to the file
-                using (StreamWriter outputFile = new StreamWriter(fullyQualifiedFilename))
+                if (File.Exists(fullyQualifiedFilename))
                 {
-                    foreach (string line in availablePlayers)
-                        outputFile.WriteLine(line);
+                    // Rename the old file
+                    File.Copy(fullyQualifiedFilename, filenamePath + date + _availablePlayersFilename);
+                }
+
+                try
+                {
+                    // Write the list of available players to the file
+                    using (StreamWriter outputFile = new StreamWriter(fullyQualifiedFilename))
+                    {
+                        foreach (string line in availablePlayers)
+                            outputFile.WriteLine(line);
+                    }
+                }
+                catch (Exception e)
+                {
+                    // Let the user know what went wrong.
+                    Console.Write("Error: The file could not be read: ");
+                    Console.WriteLine(e.Message);
                 }
             }
-            catch (Exception e)
+            else
             {
-                // Let the user know what went wrong.
-                Console.Write("Error: The file could not be read: ");
-                Console.WriteLine(e.Message);
+                Console.WriteLine($"Directory does not exist: {filenamePath}");
             }
         }
     }
