@@ -49,15 +49,18 @@ namespace Hammertime
         public static DbConnection.Server Server { get; set; }
 
         // =====================================================
-        public static DbConnection getInstance(string server = null, string database = null, string uid = null, string password = null)
+        public static DbConnection getInstance(string uid = null, string password = null)
         // =====================================================
         {
             if (_dbConnection == null)
             {
                 if (Server == DbConnection.Server.MySql)
-                    _dbConnection = MySqlDbConnection.getInstance(server, database, uid, password);
+                    _dbConnection = MySqlDbConnection.getInstance(uid, password);
                 else if (Server == DbConnection.Server.MongoDb)
-                    throw new HammerMainException("Error: MongoDb Server unavailable.");
+                {
+                    _dbConnection = MongoDbConnection.getInstance(uid, password);
+                    //throw new HammerMainException("Error: MongoDb Server not implemented yet.");
+                }
                 else
                     throw new HammerMainException("Error: DB Server unavailable.");
             }
@@ -76,10 +79,9 @@ namespace Hammertime
         // ==============================================================
         private static string Uid { get; set; }
         private static string Password { get; set; }
-        private static string Server { get; set; }
-        private static string Database { get; set; }
         // ==============================================================
 
+        /*
         // =====================================================
         public static ArrayList Credentials()
         // =====================================================
@@ -88,11 +90,9 @@ namespace Hammertime
 
             credentials.Add(Uid);
             credentials.Add(Password);
-            credentials.Add(Server);
-            credentials.Add(Database);
-
             return credentials;
         }
+        */
 
         // ==============================================================
         // Establishes the server, the database, the user ID, and the password.
@@ -101,10 +101,6 @@ namespace Hammertime
         {
             ConsoleKeyInfo cki;
             StringBuilder sb = new StringBuilder();
-
-            // For now default to our local Teamopolis database
-            Server = "localhost";
-            Database = "mondaynighthockey";
 
             // Get the user
             Console.WriteLine();
@@ -156,7 +152,7 @@ namespace Hammertime
         // ==============================================================
         {
             // Before all else set user credentials
-            // Establishes the server, the database, the user ID, and the password.
+            // Establishes the user ID, and the password.
             SetCredentials();
 
             // Next establish the default database.
@@ -173,7 +169,7 @@ namespace Hammertime
                 try
                 {
                     // Log in to server
-                    DbConnection dbConnection = HammerMainDb.getInstance(Server, Database, Uid, Password);
+                    DbConnection dbConnection = HammerMainDb.getInstance(Uid, Password);
 
                     if (dbConnection.Connected())
                     {

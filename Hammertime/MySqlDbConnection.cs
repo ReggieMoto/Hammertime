@@ -25,36 +25,36 @@ namespace Hammertime
 {
     public sealed class MySqlDbConnection : DbConnection
     {
+        // The MySqlDbConnection class is a handle on the MySql database.
+        // This class is used to perform the database operations.
+        // The actual connection to the MySQl database is the MySqlConnection var below.
         private static MySqlConnection _connection;
-        private static string _server, _database, _uid;
-        private static string _connectionString;
         private static bool _connected;
 
+        private static string _server = "localhost";
+        private static string _database = "mondaynighthockey";
+
         // =====================================================
-        public static MySqlDbConnection getInstance(string server = null, string database = null, string uid = null, string password = null)
+        public static MySqlDbConnection getInstance(string uid = null, string password = null)
         // =====================================================
         {
             if (_dbConnection == null)
             {
-                //Console.WriteLine("Setting up DbConnection for the first time.");
-
-                _server = server;
-                _database = database;
-                _uid = uid;
-
-                _connectionString = "SERVER=" + server + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";" + "DATABASE=" + database + ";";
-                _connectionString += "charset=utf8;convertzerodatetime=true;";
-                _dbConnection = new MySqlDbConnection();
+                _dbConnection = new MySqlDbConnection(uid, password);
             }
-            // Console.WriteLine("Exiting DB connection constructor.");
+
             return (MySqlDbConnection)_dbConnection;
         }
 
         // =====================================================
         //Constructor
-        private MySqlDbConnection()
+        private MySqlDbConnection(string uid, string password)
         // =====================================================
         {
+            string _connectionString;
+
+            _connectionString = "SERVER=" + _server + ";" + "DATABASE=" + _database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";";
+            _connectionString += "charset=utf8;convertzerodatetime=true;";
             _connection = new MySqlConnection(_connectionString);
 
             try
@@ -118,13 +118,37 @@ namespace Hammertime
 
         // =====================================================
         //Insert statement
-        public override bool Insert(string mySqlQuery)
+        public override bool Insert(HockeyPlayer player)
         // =====================================================
         {
             bool insertStatus = false;
 
             if (OpenConnection() == true)
             {
+                string firstName = player.FirstName;
+                string lastName = player.LastName;
+                string position = player.PlayerPos;
+                string playerType = player.PlayerType.ToString();
+
+                string skillLevel;
+                if (player.Level == HockeyPlayer.PlayerSkill.Level_A)
+                    skillLevel = "A";
+                else if (player.Level == HockeyPlayer.PlayerSkill.Level_B)
+                    skillLevel = "B";
+                else if (player.Level == HockeyPlayer.PlayerSkill.Level_C)
+                    skillLevel = "C";
+                else //(player.Level == HockeyPlayer.PlayerSkill.Level_D)
+                    skillLevel = "D";
+
+                string goalie;
+                if (player.Goalie == true)
+                    goalie = "Y";
+                else
+                    goalie = "N";
+
+                string mySqlQuery = $"insert into mondaynighthockey.players (player_last_name, player_first_name, player_level, player_position, player_goalie, player_type, player_team, player_last_wk) values (\"{lastName}\", \"{firstName}\", '{skillLevel[0]}', \"{position}\", '{goalie[0]}', \"{playerType}\", \"Unaffiliated\", \"Zed\")";
+                Console.WriteLine(mySqlQuery);
+
                 //Create Command
                 MySqlCommand cmd = new MySqlCommand(mySqlQuery, _connection);
                 // Execute the INSERT

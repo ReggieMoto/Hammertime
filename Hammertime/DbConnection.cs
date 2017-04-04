@@ -50,7 +50,7 @@ namespace Hammertime
         // CRUD
         // =====================================================
         //Insert/Create statement
-        public abstract bool Insert(string cmd);
+        public abstract bool Insert(HockeyPlayer player);
         // =====================================================
 
         // =====================================================

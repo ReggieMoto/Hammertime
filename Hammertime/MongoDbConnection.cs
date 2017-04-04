@@ -18,9 +18,27 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using MongoDB.Bson.Serialization;
 
 namespace Hammertime
 {
+    /*
+    BsonDocument document = new BsonDocument
+    {
+        { "address" , new BsonDocument
+            {
+                { "street", "2 Avenue" },
+                { "zipcode", "10075" },
+                { "building", "1480" },
+                { "coord", new BsonArray { 73.9557413, 40.7720266 } }
+            }
+        }
+    };
+    */
+
     // =====================================================
     public class MongoDbException : System.Exception
     // =====================================================
@@ -35,30 +53,31 @@ namespace Hammertime
         }
     }
 
-    class MongoDbConnection : DbConnection
+    sealed class MongoDbConnection : DbConnection
     {
-        private static MongoDbConnection _connection;
-        private static string _server, _database, _uid;
-        private static string _connectionString;
+        // The MongpDbConnection class is a handle on the MongoDB database.
+        // This class is used to perform the database operations.
+        // The actual connection to the MongoDB database is the MongoClient var below.
+        private static IMongoClient _mongoClient = null;
+        private static IMongoDatabase _mongoDb = null;
+        private static IMongoCollection<BsonDocument> _mongoCollection = null;
+
+        // mongodb://[username:password@]host1[:port1]
+        private static string _server = @"mongodb://localhost:27017";
+        private static string _database = "Hammertime";
+        private static string _collection = "mondaynighthockey";
+
         private static bool _connected;
 
         // =====================================================
-        public static MongoDbConnection getInstance(string server = null, string database = null, string uid = null, string password = null)
+        public static MongoDbConnection getInstance(string uid = null, string password = null)
         // =====================================================
         {
             if (_dbConnection == null)
             {
-                //Console.WriteLine("Setting up DbConnection for the first time.");
-
-                _server = server;
-                _database = database;
-                _uid = uid;
-
-                _connectionString = "SERVER=" + server + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";" + "DATABASE=" + database + ";";
-                _connectionString += "charset=utf8;convertzerodatetime=true;";
                 _dbConnection = new MongoDbConnection();
             }
-            // Console.WriteLine("Exiting DB connection constructor.");
+
             return (MongoDbConnection)_dbConnection;
         }
 
@@ -67,6 +86,48 @@ namespace Hammertime
         private MongoDbConnection()
         // =====================================================
         {
+            string connectionString = _server + "/" + _database;
+            BsonClassMap.RegisterClassMap<HockeyPlayer>();
+
+            try
+            {
+                _mongoClient = new MongoClient(connectionString);
+
+                if (_mongoClient != null)
+                {
+                    Console.WriteLine("MongoDb client initialized.");
+                    _mongoDb = _mongoClient.GetDatabase(_database);
+
+                    if (_mongoDb != null)
+                    {
+                        Console.WriteLine($"MongoDb database \"{_database}\" has been retrieved.");
+                        _mongoCollection = _mongoDb.GetCollection<BsonDocument>(_collection);
+                        
+                        if (_mongoCollection != null)
+                        {
+                            Console.WriteLine($"MongoDb collection \"{_collection}\" has been retrieved.");
+                            _connected = true;
+                        }
+                        else
+                            Console.WriteLine($"Failed to retrieve MongoDb collection \"{_collection}\".");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Failed to retrieve MongoDb database \"{_database}\".");
+                    }
+
+               }
+                else
+                {
+                    Console.WriteLine("Failed to initialize the MongoDb Client.");
+                }
+            }
+            catch (MongoConfigurationException ex)
+            {
+                Console.WriteLine();
+                Console.WriteLine($"{ex.Message}");
+                Console.WriteLine();
+            }
         }
 
         // =====================================================
@@ -91,10 +152,30 @@ namespace Hammertime
         }
 
         // =====================================================
-        public override bool Insert(string cmd)
+        public override bool Insert(HockeyPlayer player)
         // =====================================================
         {
-            throw new NotImplementedException();
+            bool insertSuccess = false;
+
+            if (Connected())
+            {
+                var playerDoc = new BsonDocument
+                {
+                    { "player_last_name", player.LastName },
+                    { "player_first_name", player.FirstName },
+                    { "player_level", player.Level },
+                    { "player_position", player.PlayerPos },
+                    { "player_goalie", player.Goalie },
+                    { "player_type", player.PlayerType },
+                    { "player_team", "Unaffiliated" },
+                    { "player_last_wk", "Zed" }
+                };
+
+                _mongoCollection.InsertOne(playerDoc);
+                insertSuccess = true;
+            }
+
+            return insertSuccess;
         }
 
         // =====================================================

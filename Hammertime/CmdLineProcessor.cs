@@ -18,7 +18,6 @@
 
 
 using System;
-using System.Collections;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -57,11 +56,6 @@ namespace Hammertime
     class CmdLineProcessor
     {
         private static CmdLineProcessor _cmdLineProcessor = null;
-
-        private static string Uid { get; set; }
-        private static string Password { get; set; }
-        private static string Server { get; set; }
-        private static string Database { get; set; }
 
         // =====================================================
         public static CmdLineProcessor getInstance()
@@ -241,9 +235,10 @@ namespace Hammertime
         // ==============================================================
         {
             bool dbRestored = false;
+            //ArrayList credentials = HammerMain.Credentials();
 
             // Log in to server
-            DbConnection dbConnection = HammerMainDb.getInstance(Server, Database, Uid, Password);
+            DbConnection dbConnection = HammerMainDb.getInstance(); // (string)credentials[0], (string)credentials[1]
 
             if (dbConnection.Connected())
             {
@@ -258,9 +253,10 @@ namespace Hammertime
         // ==============================================================
         {
             bool dbBackedUp = false;
+            //ArrayList credentials = HammerMain.Credentials();
 
             // Log in to server
-            DbConnection dbConnection = HammerMainDb.getInstance(Server, Database, Uid, Password);
+            DbConnection dbConnection = HammerMainDb.getInstance(); // (string)credentials[0], (string)credentials[1]
 
             if (dbConnection.Connected())
             {
@@ -274,12 +270,11 @@ namespace Hammertime
         private static bool PlayerAttrs()
         // ==============================================================
         {
-            // delete from mondaynighthockey.players where player_id=;
-
             bool playerFound = false;
+            //ArrayList credentials = HammerMain.Credentials();
 
             // Log in to server
-            DbConnection dbConnection = HammerMainDb.getInstance(Server, Database, Uid, Password);
+            DbConnection dbConnection = HammerMainDb.getInstance(); // (string)credentials[0], (string)credentials[1]
 
             if (dbConnection.Connected())
             {
@@ -324,12 +319,11 @@ namespace Hammertime
         private static bool DeletePlayer()
         // ==============================================================
         {
-            // delete from mondaynighthockey.players where player_id=;
-
             bool playerDeleted = false;
+            //ArrayList credentials = HammerMain.Credentials();
 
             // Log in to server
-            DbConnection dbConnection = HammerMainDb.getInstance(Server, Database, Uid, Password);
+            DbConnection dbConnection = HammerMainDb.getInstance(); //(string)credentials[0], (string)credentials[1]
 
             if (dbConnection.Connected())
             {
@@ -384,13 +378,18 @@ namespace Hammertime
             string firstName = null;
             string lastName = null;
             string position = null;
-            string skillLevel = null;
-            string goalie = null;
+            string plyrSkillLevel = null;
+            string canPlayGoalie = null;
             string playerType = null;
             string anotherPlayer = null;
 
+            bool goalie;
+            HockeyPlayer.PlayerSkill skillLevel;
+
+            //ArrayList credentials = HammerMain.Credentials();
+
             // Log in to server
-            DbConnection dbConnection = HammerMainDb.getInstance(Server, Database, Uid, Password);
+            DbConnection dbConnection = HammerMainDb.getInstance(); // (string)credentials[0], (string)credentials[1]
 
             if (dbConnection.Connected())
             {
@@ -411,11 +410,20 @@ namespace Hammertime
                     do
                     {
                         Console.Write("Player's skill level (A/B/C/D): ");
-                        skillLevel = getKbdInput();
-                    } while ((skillLevel != "A") &&
-                             (skillLevel != "B") &&
-                             (skillLevel != "C") &&
-                             (skillLevel != "D"));
+                        plyrSkillLevel = getKbdInput();
+                    } while ((plyrSkillLevel != "A") &&
+                             (plyrSkillLevel != "B") &&
+                             (plyrSkillLevel != "C") &&
+                             (plyrSkillLevel != "D"));
+
+                    if (plyrSkillLevel == "A")
+                        skillLevel = HockeyPlayer.PlayerSkill.Level_A;
+                    else if (plyrSkillLevel == "B")
+                        skillLevel = HockeyPlayer.PlayerSkill.Level_B;
+                    else if (plyrSkillLevel == "C")
+                        skillLevel = HockeyPlayer.PlayerSkill.Level_C;
+                    else // (plyrSkillLevel == "D")
+                        skillLevel = HockeyPlayer.PlayerSkill.Level_D;
 
                     do
                     {
@@ -432,9 +440,13 @@ namespace Hammertime
                     do
                     {
                         Console.Write("If not a goalie can the player also play as a goalie? (Y/N) ");
-                        goalie = getKbdInput();
-                    } while ((goalie != "Y") &&
-                             (goalie != "N"));
+                        canPlayGoalie = getKbdInput();
+                    } while ((canPlayGoalie != "Y") &&
+                             (canPlayGoalie != "N"));
+                    if (canPlayGoalie == "Y")
+                        goalie = true;
+                    else
+                        goalie = false;
 
                     do
                     {
@@ -445,11 +457,21 @@ namespace Hammertime
 
                     Console.WriteLine();
                     Console.WriteLine($"About to add new player {firstName} {lastName} to the db.");
-                    Console.WriteLine($"{firstName} is a level {skillLevel} player who plays {position}.");
+                    Console.WriteLine($"{firstName} is a level {plyrSkillLevel} player who plays {position}.");
                     Console.WriteLine();
-                    string mySqlQuery = $"insert into mondaynighthockey.players (player_last_name, player_first_name, player_level, player_position, player_goalie, player_type, player_team, player_last_wk) values (\"{lastName}\", \"{firstName}\", '{skillLevel[0]}', \"{position}\", '{goalie[0]}', \"{playerType}\", \"Unaffiliated\", \"Zed\")";
-                    Console.WriteLine(mySqlQuery);
-                    //newPlayerAdded = dbConnection.Insert(mySqlQuery);
+
+                    HockeyPlayer player = new HockeyPlayer(
+                        0,
+                        lastName,
+                        firstName,
+                        skillLevel,
+                        position,
+                        goalie,
+                        playerType[0],
+                        "Unaffiliated",
+                        "Zed");
+
+                    newPlayerAdded = dbConnection.Insert(player);
                     Console.WriteLine();
 
                     if (newPlayerAdded)
