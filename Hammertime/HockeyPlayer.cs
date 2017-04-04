@@ -25,19 +25,6 @@ namespace Hammertime
     public class HockeyPlayer
     // ====================
     {
-        public enum PlayerAttributes
-        {
-            ID,
-            LastName,
-            FirstName,
-            Level,
-            Position,
-            Goalie,
-            Type,
-            Team,
-            LastWeek
-        }
-
         public enum PlayerSkill
         {
             Level_D = 1,
@@ -54,10 +41,20 @@ namespace Hammertime
             Level_A = 4
         }
 
-        // Public
+        public string LastName { get; set; }
+        public string FirstName { get; set; }
+        public PlayerSkill Level { get; set; }
+        public string PlayerPos { get; set; }           // Player's normal position
+        public bool Goalie { get; set; }                // Also can play goalie
+        public char PlayerType { get; set; }            // Full time, Sub
+        public string PlayerTeam { get; set; }          // Ben, Barry, Unaffiliated
+        public string PlayerLastWeek { get; set; }      // White, Black, Zed (Didn't play)
+        public bool AssignedToTeam { get; set; }        // Is the player assigned to a team yet
+        public PlayerValue PlayerScore { get; set; }    // Derived from Skill Level
+
         // ==============================================================
         public HockeyPlayer(
-            int player_id,
+        // ==============================================================
             string player_last_name,
             string player_first_name,
             PlayerSkill player_level,
@@ -68,7 +65,6 @@ namespace Hammertime
             string player_last_wk)
         // ==============================================================
         {
-            PlayerID = player_id;
             LastName = player_last_name;
             FirstName = player_first_name;
             Level = player_level;
@@ -97,24 +93,11 @@ namespace Hammertime
             }
         }
 
-        public int PlayerID { get; set; }
-        public string LastName { get; set; }
-        public string FirstName { get; set; }
-        public PlayerSkill Level { get; set; }
-        public string PlayerPos { get; set; }           // Player's normal position
-        public bool Goalie { get; set; }                // Also can play goalie
-        public char PlayerType { get; set; }            // Full time, Sub
-        public string PlayerTeam { get; set; }          // Ben, Barry, Unaffiliated
-        public string PlayerLastWeek { get; set; }      // White, Black, Zed (Didn't play)
-        public bool AssignedToTeam { get; set; }        // Is the player assigned to a team yet
-        public PlayerValue PlayerScore { get; set; }    // Derived from Skill Level
-
         // ==============================================================
         public HockeyPlayer(HockeyPlayer player)
         // ==============================================================
         {
             LastName = player.LastName;
-            PlayerID = player.PlayerID;
             FirstName = player.FirstName;
             Level = player.Level;
             PlayerPos = player.PlayerPos;

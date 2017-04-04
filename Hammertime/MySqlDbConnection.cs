@@ -23,6 +23,50 @@ using System.IO;
 
 namespace Hammertime
 {
+    // =====================================================
+    public class MySqlDbHockeyPlayer : HockeyPlayer
+    // =====================================================
+    {
+        public int PlayerId { get; set; }
+
+        public MySqlDbHockeyPlayer(
+            int player_id,
+            string player_last_name,
+            string player_first_name,
+            PlayerSkill player_level,
+            string player_position,
+            bool player_goalie,
+            char player_type,
+            string player_team,
+            string player_last_wk) : base(
+                player_last_name,
+                player_first_name,
+                player_level,
+                player_position,
+                player_goalie,
+                player_type,
+                player_team,
+                player_last_wk)
+        {
+            PlayerId = player_id; // MongoDb specific
+        }
+
+        // ==============================================================
+        public MySqlDbHockeyPlayer(MySqlDbHockeyPlayer player) : base(player)
+        // ==============================================================
+        {
+            PlayerId = player.PlayerId;
+        }
+
+        // ==============================================================
+        public MySqlDbHockeyPlayer(HockeyPlayer player) : base(player)
+        // ==============================================================
+        {
+            PlayerId = 0;
+        }
+
+    }
+
     public sealed class MySqlDbConnection : DbConnection
     {
         // The MySqlDbConnection class is a handle on the MySql database.
@@ -274,14 +318,13 @@ namespace Hammertime
                     if (goalie == "Y")
                         canPlayGoalie = true;
 
-                    player = new HockeyPlayer(playerId, lastName, firstName, skillLevel, position, canPlayGoalie, type[0], team, lastWeek);
+                    player = new MySqlDbHockeyPlayer(playerId, lastName, firstName, skillLevel, position, canPlayGoalie, type[0], team, lastWeek);
                 }
 
                 CloseConnection();
             }
 
             return player;
-
         }
 
         // =====================================================
@@ -329,7 +372,7 @@ namespace Hammertime
                     if (goalie == "Y")
                         canPlayGoalie = true;
 
-                    playerList.Add(new HockeyPlayer(playerId, lastName, firstName, skillLevel, position, canPlayGoalie, type[0], team, lastWeek));
+                    playerList.Add(new MySqlDbHockeyPlayer(playerId, lastName, firstName, skillLevel, position, canPlayGoalie, type[0], team, lastWeek));
                 }
 
                 CloseConnection();

@@ -18,8 +18,8 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using MongoDB.Bson;
+using MongoDB.Bson.IO;
 using MongoDB.Driver;
 using MongoDB.Bson.Serialization;
 
@@ -38,6 +38,97 @@ namespace Hammertime
         }
     };
     */
+
+    // =====================================================
+    public class MongoDbHockeyPlayer : HockeyPlayer
+    // =====================================================
+    {
+        public ObjectId _id {get; set; }
+
+        public string player_last_name
+        {
+            get { return LastName; }
+            set { LastName = player_last_name; }
+        }
+
+        public string player_first_name
+        {
+            get { return FirstName; }
+            set { FirstName = player_first_name; }
+        }
+
+        public PlayerSkill player_level
+        {
+            get { return Level; }
+            set { Level = player_level; }
+        }
+
+        public string player_position     // Player's normal position
+        {
+            get { return PlayerPos; }
+            set { PlayerPos = player_position; }
+        }
+
+        public bool player_goalie         // Also can play goalie
+        {
+            get { return Goalie; }
+            set { Goalie = player_goalie; }
+        }
+
+        public char player_type           // Full time, Sub
+        {
+            get { return PlayerType; }
+            set { PlayerType = player_type; }
+        }
+
+        public string player_team         // Ben, Barry, Unaffiliated
+        {
+            get { return PlayerTeam; }
+            set { PlayerTeam = player_team; }
+        }
+
+        public string player_last_wk      // White, Black, Zed (Didn't play)
+        {
+            get { return PlayerLastWeek; }
+            set { PlayerLastWeek = player_last_wk; }
+        }
+
+        public MongoDbHockeyPlayer(
+            ObjectId player_id,
+            string player_last_name,
+            string player_first_name,
+            PlayerSkill player_level,
+            string player_position,
+            bool player_goalie,
+            char player_type,
+            string player_team,
+            string player_last_wk) : base (
+                player_last_name,
+                player_first_name,
+                player_level,
+                player_position,
+                player_goalie,
+                player_type,
+                player_team,
+                player_last_wk)
+        {
+            _id = player_id; // MongoDb specific
+        }
+
+        // ==============================================================
+        public MongoDbHockeyPlayer(MongoDbHockeyPlayer player) : base (player)
+        // ==============================================================
+        {
+            _id = player._id;
+        }
+
+        // ==============================================================
+        public MongoDbHockeyPlayer(HockeyPlayer player) : base(player)
+        // ==============================================================
+        {
+            _id = ObjectId.Empty;
+        }
+    }
 
     // =====================================================
     public class MongoDbException : System.Exception
@@ -87,7 +178,7 @@ namespace Hammertime
         // =====================================================
         {
             string connectionString = _server + "/" + _database;
-            BsonClassMap.RegisterClassMap<HockeyPlayer>();
+            BsonClassMap.RegisterClassMap<MongoDbHockeyPlayer>();
 
             try
             {
@@ -95,17 +186,17 @@ namespace Hammertime
 
                 if (_mongoClient != null)
                 {
-                    Console.WriteLine("MongoDb client initialized.");
+                    //Console.WriteLine("MongoDb client initialized.");
                     _mongoDb = _mongoClient.GetDatabase(_database);
 
                     if (_mongoDb != null)
                     {
-                        Console.WriteLine($"MongoDb database \"{_database}\" has been retrieved.");
+                        //Console.WriteLine($"MongoDb database \"{_database}\" has been retrieved.");
                         _mongoCollection = _mongoDb.GetCollection<BsonDocument>(_collection);
                         
                         if (_mongoCollection != null)
                         {
-                            Console.WriteLine($"MongoDb collection \"{_collection}\" has been retrieved.");
+                            //Console.WriteLine($"MongoDb collection \"{_collection}\" has been retrieved.");
                             _connected = true;
                         }
                         else
@@ -152,26 +243,21 @@ namespace Hammertime
         }
 
         // =====================================================
-        public override bool Insert(HockeyPlayer player)
+        public override bool Insert(HockeyPlayer hockeyPlayer)
         // =====================================================
         {
             bool insertSuccess = false;
 
             if (Connected())
             {
-                var playerDoc = new BsonDocument
-                {
-                    { "player_last_name", player.LastName },
-                    { "player_first_name", player.FirstName },
-                    { "player_level", player.Level },
-                    { "player_position", player.PlayerPos },
-                    { "player_goalie", player.Goalie },
-                    { "player_type", player.PlayerType },
-                    { "player_team", "Unaffiliated" },
-                    { "player_last_wk", "Zed" }
-                };
+                MongoDbHockeyPlayer player = new MongoDbHockeyPlayer(hockeyPlayer);
 
-                _mongoCollection.InsertOne(playerDoc);
+                var playerDoc = new BsonDocument();
+                var bsonWriter = new BsonDocumentWriter(playerDoc);
+                BsonSerializer.Serialize(bsonWriter, player);   // Serialize MongoDbHockeyPlayer to BsonDocument
+
+                _mongoCollection.InsertOne(playerDoc); // Insert the BsonDocument into the database
+
                 insertSuccess = true;
             }
 
@@ -179,10 +265,35 @@ namespace Hammertime
         }
 
         // =====================================================
-        public override HockeyPlayer Read(string cmd)
+        // Read a player out of the database
+        // Expect "first last"
+        public override HockeyPlayer Read(string playerName)
         // =====================================================
         {
-            throw new NotImplementedException();
+            MongoDbHockeyPlayer hockeyPlayer = null;
+
+            if (Connected())
+            {
+                // Parse the string into last_name/first_name
+                string[] name = playerName.Split(' ');
+
+                var filter = Builders<BsonDocument>.Filter.Eq("player_last_name", name[1]);
+                if (name.Length == 3 && name[1] == "St.")
+                    filter = Builders<BsonDocument>.Filter.Eq("player_last_name", name[1] + " " + name[2]);
+
+
+                var results = _mongoCollection.Find(filter).ToList();
+
+                foreach (BsonDocument player in results)
+                {
+                    hockeyPlayer = BsonSerializer.Deserialize<MongoDbHockeyPlayer>(player);
+
+                    if (hockeyPlayer.FirstName == name[0])
+                        break;
+                }
+            }
+
+            return hockeyPlayer;
         }
 
         // =====================================================

@@ -300,7 +300,6 @@ namespace Hammertime
                 {
                     playerFound = true;
                     Console.WriteLine($"Player {player}:");
-                    Console.WriteLine($"\tDB ID: {dbPlayer.PlayerID}");
                     Console.WriteLine($"\tSkill level: {dbPlayer.Level}");
                     Console.WriteLine($"\tPosition: {dbPlayer.PlayerPos}");
                     Console.WriteLine($"\tCan play goalie: {dbPlayer.Goalie}");
@@ -358,7 +357,7 @@ namespace Hammertime
 
                     if (deleteThisPlayer == "Y")
                     {
-                        Console.WriteLine($"delete from mondaynighthockey.players where player_id={dbPlayer.PlayerID};");
+                        //Console.WriteLine($"delete from mondaynighthockey.players where player_id={dbPlayer.PlayerID};");
                         Console.WriteLine($"Player {player} deleted from db.");
                         playerDeleted = true;
                     }
@@ -461,7 +460,6 @@ namespace Hammertime
                     Console.WriteLine();
 
                     HockeyPlayer player = new HockeyPlayer(
-                        0,
                         lastName,
                         firstName,
                         skillLevel,
