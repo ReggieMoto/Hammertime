@@ -304,14 +304,14 @@ namespace Hammertime
         }
 
         // =====================================================
-        public override bool Update(string cmd)
+        public override bool Update(HockeyPlayer player)
         // =====================================================
         {
             throw new NotImplementedException();
         }
 
         // =====================================================
-        public override bool Delete(string cmd)
+        public override bool Delete(HockeyPlayer player)
         // =====================================================
         {
             throw new NotImplementedException();

@@ -68,8 +68,7 @@ namespace Hammertime
             var query = from HockeyPlayer player in _availableFullTimePlayers select player;
             foreach (HockeyPlayer player in query)
             {
-                //string mySqlQuery = $"update mondaynighthockey.players set player_last_wk=\"{player.PlayerLastWeek}\" where player_id={player.PlayerID}";
-                //teamsSaved = connection.Update(mySqlQuery);
+                teamsSaved = connection.Update(player);
                 if (teamsSaved == false) break;
             }
 

@@ -61,12 +61,12 @@ namespace Hammertime
 
         // =====================================================
         //Update statement
-        public abstract bool Update(string cmd);
+        public abstract bool Update(HockeyPlayer player);
         // =====================================================
 
         // =====================================================
         //Delete statement
-        public abstract bool Delete(string cmd);
+        public abstract bool Delete(HockeyPlayer player);
         // =====================================================
 
         // =====================================================

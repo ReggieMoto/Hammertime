@@ -299,6 +299,7 @@ namespace Hammertime
                 if (dbPlayer != null)
                 {
                     playerFound = true;
+                    Console.WriteLine();
                     Console.WriteLine($"Player {player}:");
                     Console.WriteLine($"\tSkill level: {dbPlayer.Level}");
                     Console.WriteLine($"\tPosition: {dbPlayer.PlayerPos}");
@@ -357,7 +358,7 @@ namespace Hammertime
 
                     if (deleteThisPlayer == "Y")
                     {
-                        //Console.WriteLine($"delete from mondaynighthockey.players where player_id={dbPlayer.PlayerID};");
+                        dbConnection.Delete(dbPlayer);
                         Console.WriteLine($"Player {player} deleted from db.");
                         playerDeleted = true;
                     }
@@ -384,8 +385,6 @@ namespace Hammertime
 
             bool goalie;
             HockeyPlayer.PlayerSkill skillLevel;
-
-            //ArrayList credentials = HammerMain.Credentials();
 
             // Log in to server
             DbConnection dbConnection = HammerMainDb.getInstance(); // (string)credentials[0], (string)credentials[1]

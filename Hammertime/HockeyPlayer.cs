@@ -16,9 +16,6 @@
 // is obtained David Hammond.
 // ==============================================================
 
-using System;
-using System.Text;
-
 namespace Hammertime
 {
     // ====================

@@ -17,7 +17,6 @@
 // ==============================================================
 
 using System;
-using System.Collections;
 using System.Text;
 
 namespace Hammertime
@@ -57,10 +56,7 @@ namespace Hammertime
                 if (Server == DbConnection.Server.MySql)
                     _dbConnection = MySqlDbConnection.getInstance(uid, password);
                 else if (Server == DbConnection.Server.MongoDb)
-                {
                     _dbConnection = MongoDbConnection.getInstance(uid, password);
-                    //throw new HammerMainException("Error: MongoDb Server not implemented yet.");
-                }
                 else
                     throw new HammerMainException("Error: DB Server unavailable.");
             }
@@ -80,19 +76,6 @@ namespace Hammertime
         private static string Uid { get; set; }
         private static string Password { get; set; }
         // ==============================================================
-
-        /*
-        // =====================================================
-        public static ArrayList Credentials()
-        // =====================================================
-        {
-            ArrayList credentials = new ArrayList();
-
-            credentials.Add(Uid);
-            credentials.Add(Password);
-            return credentials;
-        }
-        */
 
         // ==============================================================
         // Establishes the server, the database, the user ID, and the password.
@@ -140,11 +123,6 @@ namespace Hammertime
             } while (cki.Key != ConsoleKey.Enter);
 
             Password = sb.ToString();
-
-            Console.WriteLine();
-            // Console.WriteLine($"uid: {Uid}");
-            // Console.WriteLine($"password: {Password}");
-            Console.WriteLine();
         }
 
         // ==============================================================
@@ -162,9 +140,6 @@ namespace Hammertime
                 // What does the user want to do?
                 // Parse command line args
                 CmdLineProcessor.getInstance().Parse(args);
-
-                // Temporary
-                //HammertimeServer.Instance.AsyncListener();
 
                 try
                 {

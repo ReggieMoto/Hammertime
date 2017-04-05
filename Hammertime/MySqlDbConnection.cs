@@ -166,26 +166,27 @@ namespace Hammertime
         // =====================================================
         {
             bool insertStatus = false;
+            MySqlDbHockeyPlayer hockeyPlayer = new MySqlDbHockeyPlayer(player);
 
             if (OpenConnection() == true)
             {
-                string firstName = player.FirstName;
-                string lastName = player.LastName;
-                string position = player.PlayerPos;
-                string playerType = player.PlayerType.ToString();
+                string firstName = hockeyPlayer.FirstName;
+                string lastName = hockeyPlayer.LastName;
+                string position = hockeyPlayer.PlayerPos;
+                string playerType = hockeyPlayer.PlayerType.ToString();
 
                 string skillLevel;
-                if (player.Level == HockeyPlayer.PlayerSkill.Level_A)
+                if (hockeyPlayer.Level == HockeyPlayer.PlayerSkill.Level_A)
                     skillLevel = "A";
-                else if (player.Level == HockeyPlayer.PlayerSkill.Level_B)
+                else if (hockeyPlayer.Level == HockeyPlayer.PlayerSkill.Level_B)
                     skillLevel = "B";
-                else if (player.Level == HockeyPlayer.PlayerSkill.Level_C)
+                else if (hockeyPlayer.Level == HockeyPlayer.PlayerSkill.Level_C)
                     skillLevel = "C";
-                else //(player.Level == HockeyPlayer.PlayerSkill.Level_D)
+                else //(hockeyPlayer.Level == HockeyPlayer.PlayerSkill.Level_D)
                     skillLevel = "D";
 
                 string goalie;
-                if (player.Goalie == true)
+                if (hockeyPlayer.Goalie == true)
                     goalie = "Y";
                 else
                     goalie = "N";
@@ -209,22 +210,30 @@ namespace Hammertime
 
         // =====================================================
         //Update statement
-        public override bool Update(string mySqlQuery)
+        public override bool Update(HockeyPlayer player)
         // =====================================================
         {
             bool updateStatus = false;
 
+            string playerName = player.FirstName + " " + player.LastName;
+            MySqlDbHockeyPlayer hockeyPlayer = (MySqlDbHockeyPlayer)Read(playerName);
+
             if (OpenConnection() == true)
             {
-                //Create Command
-                MySqlCommand cmd = new MySqlCommand(mySqlQuery, _connection);
-                // Execute the UPDATE
-                int affectedRows = cmd.ExecuteNonQuery();
+                if (hockeyPlayer != null)
+                {
+                    //Create Command
+                    string mySqlQuery = $"update mondaynighthockey.players set player_last_wk=\"{hockeyPlayer.PlayerLastWeek}\" where player_id={hockeyPlayer.PlayerId}";
+                    MySqlCommand cmd = new MySqlCommand(mySqlQuery, _connection);
+                    // Execute the UPDATE
+                    int affectedRows = cmd.ExecuteNonQuery();
+
+                    if (affectedRows == 1)
+                        updateStatus = true;
+                }
+
                 // Finished with the command
                 CloseConnection();
-
-                if (affectedRows == 1)
-                    updateStatus = true;
             }
 
             return updateStatus;
@@ -232,22 +241,30 @@ namespace Hammertime
 
         // =====================================================
         //Delete statement
-        public override bool Delete(string mySqlQuery)
+        public override bool Delete(HockeyPlayer player)
         // =====================================================
         {
             bool updateStatus = false;
 
+            string playerName = player.FirstName + " " + player.LastName;
+            MySqlDbHockeyPlayer hockeyPlayer = (MySqlDbHockeyPlayer)Read(playerName);
+
             if (OpenConnection() == true)
             {
-                //Create Command
-                MySqlCommand cmd = new MySqlCommand(mySqlQuery, _connection);
-                // Execute the DELETE
-                int affectedRows = cmd.ExecuteNonQuery();
+                if (hockeyPlayer != null)
+                {
+                    //Create Command
+                    string mySqlQuery = $"delete from mondaynighthockey.players where player_id={hockeyPlayer.PlayerId}";
+                    MySqlCommand cmd = new MySqlCommand(mySqlQuery, _connection);
+                    // Execute the DELETE
+                    int affectedRows = cmd.ExecuteNonQuery();
+
+                    if (affectedRows == 1)
+                        updateStatus = true;
+                }
+
                 // Finished with the command
                 CloseConnection();
-
-                if (affectedRows == 1)
-                    updateStatus = true;
             }
 
             return updateStatus;
@@ -272,7 +289,7 @@ namespace Hammertime
         public HockeyPlayer SelectPlayer(string playerName)    // Expect "first last"
         // =====================================================
         {
-            HockeyPlayer player = null;
+            MySqlDbHockeyPlayer player = null;
             string query = null;
 
             if (OpenConnection() == true)
