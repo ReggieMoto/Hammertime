@@ -16,8 +16,7 @@
 // is obtained David Hammond.
 // ==============================================================
 
-using System;
-using System.Collections;
+using System.Collections.Generic;
 
 namespace Hammertime
 {
@@ -56,7 +55,7 @@ namespace Hammertime
         // =====================================================
         // Read statement
         public abstract HockeyPlayer Read(string cmd);
-        public abstract ArrayList Read();
+        public abstract List<HockeyPlayer> Read();
         // =====================================================
 
         // =====================================================

@@ -17,7 +17,6 @@
 // ==============================================================
 
 using System;
-using System.Text;
 
 namespace Hammertime
 {
@@ -44,7 +43,6 @@ namespace Hammertime
     // =====================================================
     {
         private static DbConnection _dbConnection = null;
-
         public static DbConnection.Server Server { get; set; }
 
         // =====================================================
@@ -54,9 +52,9 @@ namespace Hammertime
             if (_dbConnection == null)
             {
                 if (Server == DbConnection.Server.MySql)
-                    _dbConnection = MySqlDbConnection.getInstance(uid, password);
+                    _dbConnection = MySqlDbConnection.getInstance();
                 else if (Server == DbConnection.Server.MongoDb)
-                    _dbConnection = MongoDbConnection.getInstance(uid, password);
+                    _dbConnection = MongoDbConnection.getInstance();
                 else
                     throw new HammerMainException("Error: DB Server unavailable.");
             }
@@ -73,68 +71,9 @@ namespace Hammertime
         public static bool ReadSurveyResults { get; set; }
         public static bool SaveTeams { get; set; }
         // ==============================================================
-        private static string Uid { get; set; }
-        private static string Password { get; set; }
-        // ==============================================================
-
-        // ==============================================================
-        // Establishes the server, the database, the user ID, and the password.
-        private static void SetCredentials()
-        // ==============================================================
-        {
-            ConsoleKeyInfo cki;
-            StringBuilder sb = new StringBuilder();
-
-            // Get the user
-            Console.WriteLine();
-            Console.Write("Login: ");
-            Uid = Console.ReadLine();
-
-            // Get the password
-            Console.Write("password (0-9, A-Z, a-z, +, -, _, %, ^): ");
-
-            do
-            {
-                cki = Console.ReadKey(true);
-
-                if (cki.Key == ConsoleKey.Escape)
-                {
-                    Password = null;
-                    Console.WriteLine();
-                    Console.WriteLine();
-                    return;
-                }
-
-                if ((cki.KeyChar >= '0' && cki.KeyChar <= '9') ||
-                    (cki.KeyChar >= 'A' && cki.KeyChar <= 'Z') ||
-                    (cki.KeyChar >= 'a' && cki.KeyChar <= 'z') ||
-                    (cki.KeyChar >= '+') ||
-                    (cki.KeyChar >= '-') ||
-                    (cki.KeyChar >= '_') ||
-                    (cki.KeyChar >= '%') ||
-                    (cki.KeyChar >= '^'))
-                {
-                    sb.Append(cki.KeyChar);
-                }
-
-                if ((cki.Key == ConsoleKey.Backspace) && (sb.Length >= 1))
-                    sb.Length--;
-
-            } while (cki.Key != ConsoleKey.Enter);
-
-            Password = sb.ToString();
-        }
-
-        // ==============================================================
         static void Main(string[] args)
         // ==============================================================
         {
-            // Before all else set user credentials
-            // Establishes the user ID, and the password.
-            SetCredentials();
-
-            // Next establish the default database.
-
             try
             {
                 // What does the user want to do?
@@ -144,7 +83,7 @@ namespace Hammertime
                 try
                 {
                     // Log in to server
-                    DbConnection dbConnection = HammerMainDb.getInstance(Uid, Password);
+                    DbConnection dbConnection = HammerMainDb.getInstance();
 
                     if (dbConnection.Connected())
                     {

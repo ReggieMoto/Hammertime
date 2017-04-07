@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="AvailablePlayerFileIO.cs" />
     <Compile Include="CmdLineProcessor.cs" />
+    <Compile Include="Credentials.cs" />
     <Compile Include="HammerMain.cs" />
     <Compile Include="HammertimeServer.cs" />
     <Compile Include="HockeyPlayer.cs" />

@@ -16,7 +16,6 @@
 // is obtained David Hammond.
 // ==============================================================
 
-
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -33,12 +32,14 @@ namespace Hammertime
             TooManyArgs,
             DbUnavailable,
             AddNewPlayer,
+            UpdatePlayer,
             DeletePlayer,
             PlayerAttrs,
             BackupDb,
             RestoreDb,
             SaveTeams,
             ReadSurveyResults,
+            Count,
             UnrecognizedArgs
         };
 
@@ -127,11 +128,13 @@ namespace Hammertime
             Console.WriteLine("\t--MongoDb: Using MongoDb Server.");
             Console.WriteLine("\t--ReadSurveyResults=true/false: default is true.");
             Console.WriteLine("\t--AddNewPlayer: Opens a command line dialog for adding a new player to the database.");
+            Console.WriteLine("\t--UpdatePlayer: Opens a command line dialog for modifying a player's attributes.");
             Console.WriteLine("\t--DeletePlayer: Opens a command line dialog for removing a player from the database.");
             Console.WriteLine("\t--PlayerAttrs: Opens a command line dialog to search for a player and return that player's attributes.");
             Console.WriteLine("\t--SaveTeams: Writes team assignments to the database.");
             Console.WriteLine("\t--Backup: Backup the database to the local disk.");
             Console.WriteLine("\t--Restore: Restore the database from the local disk.");
+            Console.WriteLine("\t--Count: Count of players in database.");
         }
 
         // ==============================================================
@@ -175,6 +178,13 @@ namespace Hammertime
                             throw (new CmdLineProcessorException(CmdLineProcessorException.ExceptionID.AddNewPlayer, "Error: Couldn't add the new player."));
                         cmdLineHalt = true;
                     }
+                    else if (arg == "--UpdatePlayer")
+                    {
+                        Console.WriteLine();
+                        if (UpdatePlayer() == false)
+                            throw (new CmdLineProcessorException(CmdLineProcessorException.ExceptionID.UpdatePlayer, "Error: Couldn't find the new player nor update the attributes."));
+                        cmdLineHalt = true;
+                    }
                     else if (arg == "--DeletePlayer")
                     {
                         Console.WriteLine();
@@ -209,6 +219,20 @@ namespace Hammertime
                             throw (new CmdLineProcessorException(CmdLineProcessorException.ExceptionID.RestoreDb, "Error: Couldn't restore the database."));
                         cmdLineHalt = true;
                     }
+                    else if (arg == "--Count")
+                    {
+                        int count = Count();
+
+                        Console.WriteLine();
+                        if (count == 0)
+                            Console.WriteLine("There aren't any player records in the database.");
+                        else if (count == 1)
+                            Console.WriteLine("There is one player record in the database.");
+                        else
+                            Console.WriteLine($"There are {count} player records in the database.");
+
+                        cmdLineHalt = true;
+                    }
                     else
                     {
                         string pattern = "=";
@@ -231,6 +255,22 @@ namespace Hammertime
         }
 
         // ==============================================================
+        private static int Count()
+        // ==============================================================
+        {
+            int count = 0;
+
+            DbConnection dbConnection = HammerMainDb.getInstance();
+
+            if (dbConnection.Connected())
+            {
+                count = dbConnection.Count();
+            }
+
+            return count;
+        }
+
+        // ==============================================================
         private static bool RestoreDb()
         // ==============================================================
         {
@@ -238,7 +278,7 @@ namespace Hammertime
             //ArrayList credentials = HammerMain.Credentials();
 
             // Log in to server
-            DbConnection dbConnection = HammerMainDb.getInstance(); // (string)credentials[0], (string)credentials[1]
+            DbConnection dbConnection = HammerMainDb.getInstance();
 
             if (dbConnection.Connected())
             {
@@ -256,7 +296,7 @@ namespace Hammertime
             //ArrayList credentials = HammerMain.Credentials();
 
             // Log in to server
-            DbConnection dbConnection = HammerMainDb.getInstance(); // (string)credentials[0], (string)credentials[1]
+            DbConnection dbConnection = HammerMainDb.getInstance();
 
             if (dbConnection.Connected())
             {
@@ -274,7 +314,7 @@ namespace Hammertime
             //ArrayList credentials = HammerMain.Credentials();
 
             // Log in to server
-            DbConnection dbConnection = HammerMainDb.getInstance(); // (string)credentials[0], (string)credentials[1]
+            DbConnection dbConnection = HammerMainDb.getInstance();
 
             if (dbConnection.Connected())
             {
@@ -323,7 +363,7 @@ namespace Hammertime
             //ArrayList credentials = HammerMain.Credentials();
 
             // Log in to server
-            DbConnection dbConnection = HammerMainDb.getInstance(); //(string)credentials[0], (string)credentials[1]
+            DbConnection dbConnection = HammerMainDb.getInstance();
 
             if (dbConnection.Connected())
             {
@@ -358,9 +398,13 @@ namespace Hammertime
 
                     if (deleteThisPlayer == "Y")
                     {
-                        dbConnection.Delete(dbPlayer);
-                        Console.WriteLine($"Player {player} deleted from db.");
-                        playerDeleted = true;
+                        playerDeleted = dbConnection.Delete(dbPlayer);
+                        if (playerDeleted)
+                        {
+                            Console.WriteLine($"Player {player} was deleted from db.");
+                        }
+                        else
+                            Console.WriteLine($"Player {player} was not deleted from db.");
                     }
                 }
                 else
@@ -368,6 +412,128 @@ namespace Hammertime
             }
 
             return playerDeleted;
+        }
+
+        // ==============================================================
+        private static bool UpdatePlayer()
+        // ==============================================================
+        {
+            bool updateStatus = false;
+            string position = null;
+            string plyrSkillLevel = null;
+            string canPlayGoalie = null;
+            string playerType = null;
+
+            bool goalie;
+            HockeyPlayer.PlayerSkill skillLevel;
+
+            // Log in to server
+            DbConnection dbConnection = HammerMainDb.getInstance();
+
+            if (dbConnection.Connected())
+            {
+                string firstName = null;
+                string lastName = null;
+
+                do
+                {
+                    Console.Write("Player's first name: ");
+                    firstName = getKbdInput();
+                } while (firstName == null);
+
+                do
+                {
+                    Console.Write("Player's last name: ");
+                    lastName = getKbdInput();
+                } while (lastName == null);
+
+                string player = firstName + " " + lastName;
+
+                HockeyPlayer dbPlayer = dbConnection.Read(player);
+                if (dbPlayer != null)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine($"Player {player}:");
+                    Console.WriteLine($"\tSkill level: {dbPlayer.Level}");
+                    Console.WriteLine($"\tPosition: {dbPlayer.PlayerPos}");
+                    Console.WriteLine($"\tCan play goalie: {dbPlayer.Goalie}");
+                    Console.WriteLine($"\tFulltime or sub: {dbPlayer.PlayerType}");
+                    Console.WriteLine($"\tTeam affiliation: {dbPlayer.PlayerTeam}");
+                    Console.WriteLine($"\tLast week jersey color: {dbPlayer.PlayerLastWeek}");
+                    Console.WriteLine();
+                    Console.WriteLine($"Modify player's attributes.");
+
+                    do
+                    {
+                        Console.Write("Player's skill level (A/B/C/D): ");
+                        plyrSkillLevel = getKbdInput();
+                    } while ((plyrSkillLevel != "A") &&
+                             (plyrSkillLevel != "B") &&
+                             (plyrSkillLevel != "C") &&
+                             (plyrSkillLevel != "D"));
+
+                    if (plyrSkillLevel == "A")
+                        skillLevel = HockeyPlayer.PlayerSkill.Level_A;
+                    else if (plyrSkillLevel == "B")
+                        skillLevel = HockeyPlayer.PlayerSkill.Level_B;
+                    else if (plyrSkillLevel == "C")
+                        skillLevel = HockeyPlayer.PlayerSkill.Level_C;
+                    else // (plyrSkillLevel == "D")
+                        skillLevel = HockeyPlayer.PlayerSkill.Level_D;
+
+                    do
+                    {
+                        Console.Write("Player's position (D, F, G): ");
+                        position = getKbdInput();
+                    } while ((position != "D") &&
+                             (position != "F") &&
+                             (position != "G"));
+
+                    if (position == "D") position = "Defense";
+                    else if (position == "F") position = "Forward";
+                    else position = "Goalie";
+
+                    do
+                    {
+                        Console.Write("If not a goalie can the player also play as a goalie? (Y/N) ");
+                        canPlayGoalie = getKbdInput();
+                    } while ((canPlayGoalie != "Y") &&
+                             (canPlayGoalie != "N"));
+                    if (canPlayGoalie == "Y")
+                        goalie = true;
+                    else
+                        goalie = false;
+
+                    do
+                    {
+                        Console.Write("Is the player full time or a sub? (F/S) ");
+                        playerType = getKbdInput();
+                    } while ((playerType != "F") &&
+                             (playerType != "S"));
+
+                    Console.WriteLine();
+                    Console.WriteLine($"Updating player {player}'s attributes in the db.");
+                    Console.WriteLine($"{firstName} is a level {plyrSkillLevel} player who plays {position}.");
+                    Console.WriteLine();
+
+                    HockeyPlayer hockeyPlayer = new HockeyPlayer(
+                        lastName,
+                        firstName,
+                        skillLevel,
+                        position,
+                        goalie,
+                        playerType[0],
+                        "Unaffiliated",
+                        "Zed");
+
+                    updateStatus = dbConnection.Update(hockeyPlayer);
+                    Console.WriteLine();
+                }
+                else
+                    Console.WriteLine($"Player {player} wasn't found in the db.");
+            }
+
+            return updateStatus;
         }
 
         // ==============================================================
@@ -387,7 +553,7 @@ namespace Hammertime
             HockeyPlayer.PlayerSkill skillLevel;
 
             // Log in to server
-            DbConnection dbConnection = HammerMainDb.getInstance(); // (string)credentials[0], (string)credentials[1]
+            DbConnection dbConnection = HammerMainDb.getInstance();
 
             if (dbConnection.Connected())
             {

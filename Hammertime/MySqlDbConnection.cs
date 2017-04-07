@@ -20,6 +20,7 @@ using System;
 using System.Collections;
 using MySql.Data.MySqlClient;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Hammertime
 {
@@ -48,7 +49,7 @@ namespace Hammertime
                 player_team,
                 player_last_wk)
         {
-            PlayerId = player_id; // MongoDb specific
+            PlayerId = player_id; // MySql specific
         }
 
         // ==============================================================
@@ -96,8 +97,9 @@ namespace Hammertime
         // =====================================================
         {
             string _connectionString;
+            List<string> credentials = Credentials.getCredentials();
 
-            _connectionString = "SERVER=" + _server + ";" + "DATABASE=" + _database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";";
+            _connectionString = "SERVER=" + _server + ";" + "DATABASE=" + _database + ";" + "UID=" + credentials[0] + ";" + "PASSWORD=" + credentials[1] + ";";
             _connectionString += "charset=utf8;convertzerodatetime=true;";
             _connection = new MySqlConnection(_connectionString);
 
@@ -277,7 +279,7 @@ namespace Hammertime
             return SelectPlayer(playerName);
         }
 
-        public override ArrayList Read()
+        public override List<HockeyPlayer> Read()
         {
             return SelectAllPlayers();
         }
@@ -346,10 +348,10 @@ namespace Hammertime
 
         // =====================================================
         // Select Statement
-        public ArrayList SelectAllPlayers()
+        public List<HockeyPlayer> SelectAllPlayers()
         // =====================================================
         {
-            ArrayList playerList = new ArrayList();
+            List<HockeyPlayer> playerList = new List<HockeyPlayer>();
 
             if (OpenConnection() == true)
             {

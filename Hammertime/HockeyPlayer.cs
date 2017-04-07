@@ -24,6 +24,7 @@ namespace Hammertime
     {
         public enum PlayerSkill
         {
+            Level_Z = 0,
             Level_D = 1,
             Level_C = 10,
             Level_B = 100,
@@ -32,6 +33,7 @@ namespace Hammertime
 
         public enum PlayerValue
         {
+            Level_Z = 0,
             Level_D = 1,
             Level_C = 2,
             Level_B = 3,
@@ -104,6 +106,22 @@ namespace Hammertime
             PlayerLastWeek = player.PlayerLastWeek;
             AssignedToTeam = player.AssignedToTeam;
             PlayerScore = player.PlayerScore;
+        }
+
+        // ==============================================================
+        public HockeyPlayer()
+        // ==============================================================
+        {
+            LastName = null;
+            FirstName = null;
+            Level = PlayerSkill.Level_Z;
+            PlayerPos = null;
+            Goalie = false;
+            PlayerType = 'S';
+            PlayerTeam = null;
+            PlayerLastWeek = null;
+            AssignedToTeam = false;
+            PlayerScore = PlayerValue.Level_Z;
         }
     }
 }
