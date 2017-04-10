@@ -115,6 +115,7 @@ namespace Hammertime
         {
             if (_dbConnection == null)
             {
+                Console.WriteLine("Using the MongoDb database.");
                 _dbConnection = new MongoDbConnection();
             }
 
@@ -215,9 +216,9 @@ namespace Hammertime
                     filterLN = Builders<BsonDocument>.Filter.Eq("LastName", name[1] + " " + name[2]);
                 var filter = filterFN & filterLN;
 
-                //var results = _mongoCollection.Find(filter).ToList();
                 var player = _mongoCollection.Find(filter).FirstOrDefault();
-                hockeyPlayer = BsonSerializer.Deserialize<MongoDbHockeyPlayer>(player);
+                if (player != null)
+                    hockeyPlayer = BsonSerializer.Deserialize<MongoDbHockeyPlayer>(player);
             }
 
             return hockeyPlayer;
@@ -249,13 +250,25 @@ namespace Hammertime
             bool insertSuccess = false;
             if (Connected())
             {
-                var player = new MongoDbHockeyPlayer(hockeyPlayer);
-                var playerDoc = new BsonDocument();
-                var bsonWriter = new BsonDocumentWriter(playerDoc);
-                BsonSerializer.Serialize(bsonWriter, player);   // Serialize MongoDbHockeyPlayer to BsonDocument
+                var builder = Builders<BsonDocument>.Filter;
+                var filterFN = builder.Eq("FirstName", hockeyPlayer.FirstName);
+                var filterLN = builder.Eq("LastName", hockeyPlayer.LastName);
+                var filter = filterFN & filterLN;
 
-                _mongoCollection.InsertOne(playerDoc); // Insert the BsonDocument into the database
-                insertSuccess = true;
+                // Check to see if the player is already in the database
+                if (_mongoCollection.Find(filter).FirstOrDefault() == null)
+                {
+                    // If the player is not then insert him
+                    var player = new MongoDbHockeyPlayer(hockeyPlayer);
+                    var playerDoc = new BsonDocument();
+                    var bsonWriter = new BsonDocumentWriter(playerDoc);
+                    BsonSerializer.Serialize(bsonWriter, player);   // Serialize MongoDbHockeyPlayer to BsonDocument
+
+                    _mongoCollection.InsertOne(playerDoc); // Insert the BsonDocument into the database
+                    insertSuccess = true;
+                }
+                else
+                    Console.WriteLine("Player is already in the database.");
             }
 
             return insertSuccess;

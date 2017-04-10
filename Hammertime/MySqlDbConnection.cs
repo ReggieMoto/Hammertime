@@ -17,10 +17,9 @@
 // ==============================================================
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using System.IO;
-using System.Collections.Generic;
 
 namespace Hammertime
 {
@@ -85,6 +84,7 @@ namespace Hammertime
         {
             if (_dbConnection == null)
             {
+                Console.WriteLine("Using the MySql database.");
                 _dbConnection = new MySqlDbConnection(uid, password);
             }
 

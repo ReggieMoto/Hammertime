@@ -40,6 +40,7 @@ namespace Hammertime
             SaveTeams,
             ReadSurveyResults,
             Count,
+            MigrateMySql2Mongo,
             UnrecognizedArgs
         };
 
@@ -77,7 +78,7 @@ namespace Hammertime
         {
             // This is the default DB Server.
             // This could get modified during argument parsing.
-            HammerMainDb.Server = DbConnection.Server.MySql;
+            HammerMainDb.Server = DbConnection.Server.MongoDb;
         }
 
         // ==============================================================
@@ -135,6 +136,7 @@ namespace Hammertime
             Console.WriteLine("\t--Backup: Backup the database to the local disk.");
             Console.WriteLine("\t--Restore: Restore the database from the local disk.");
             Console.WriteLine("\t--Count: Count of players in database.");
+            Console.WriteLine("\t--MigrateMySql2Mongo: Populate MongoDB with players found in MySQL DB.");
         }
 
         // ==============================================================
@@ -231,6 +233,21 @@ namespace Hammertime
                         else
                             Console.WriteLine($"There are {count} player records in the database.");
 
+                        cmdLineHalt = true;
+                    }
+                    else if (arg == "--MigrateMySql2Mongo")
+                    {
+                        Console.WriteLine();
+                        MigrationMySql2MongoDb migrationObj = MigrationMySql2MongoDb.getInstance();
+                        try
+                        {
+                            migrationObj.PerformMigration();
+                        }
+                        catch(MigrationMySql2MongoDbException ex)
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine($"Error: {ex.Message}");
+                        }
                         cmdLineHalt = true;
                     }
                     else

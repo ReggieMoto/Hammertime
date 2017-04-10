@@ -87,6 +87,7 @@
     <Compile Include="HockeyTeam.cs" />
     <Compile Include="HomeTeam.cs" />
     <Compile Include="DbConnection.cs" />
+    <Compile Include="MigrationMySql2MongoDb.cs" />
     <Compile Include="MongoDbConnection.cs" />
     <Compile Include="MySqlDbConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

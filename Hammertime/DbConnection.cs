@@ -32,6 +32,13 @@ namespace Hammertime
         protected static DbConnection _dbConnection;
 
         // =====================================================
+        public void ResetConnection()
+        // =====================================================
+        {
+            _dbConnection = null;
+        }
+
+        // =====================================================
         public abstract bool Connected();
         // =====================================================
 
