@@ -16,12 +16,14 @@
 // is obtained David Hammond.
 // ==============================================================
 
-using System.Collections;
+using System.Collections.Generic;
 
 namespace Hammertime
 {
     public sealed class VisitorTeam : HockeyTeam
     {
+        private static VisitorTeam _visitorTeam = null;
+
         // ==============================================================
         public static VisitorTeam Instance
         // ==============================================================
@@ -34,14 +36,14 @@ namespace Hammertime
             }
         }
 
-        private static VisitorTeam _visitorTeam;
+        private List<HockeyPlayer> _visitorRoster;
 
+        // ==============================================================
         private VisitorTeam()
+        // ==============================================================
             : base(Residence.Away)
         {
-            // Base class: Attach to the DB server
-            // Base class: Build a roster from the server
-            BuildTeamRoster();
+            _visitorRoster = new List<HockeyPlayer>();
         }
 
         // ==============================================================
@@ -85,8 +87,9 @@ namespace Hammertime
         // ==============================================================
         {
             //Console.WriteLine("AddAPlayer for the visitor team");
-            _visitorRoster.Add(hockeyPlayer);
+            hockeyPlayer.AssignedToTeam = true;
             hockeyPlayer.PlayerLastWeek = "White";    // This week the player will be on the home "black" team
+            _visitorRoster.Add(hockeyPlayer);
         }
 
         // ==============================================================
@@ -95,6 +98,7 @@ namespace Hammertime
         {
             //Console.WriteLine("RemoveAPlayer from the visitor team");
             _visitorRoster.Remove(hockeyPlayer);
+            hockeyPlayer.AssignedToTeam = false;
         }
 
         // ==============================================================
@@ -124,45 +128,5 @@ namespace Hammertime
             //Console.WriteLine("AddASkillPlayer for the home team");
             return AddAGoalie(_visitorRoster, strongerTeam);
         }
-
-        // ==============================================================
-        //  Rules of the road for generating a team roster:
-        //  1. Which players are available? From the survey.
-        //  2. No more than 10(S)+1(G) players per team.
-        //  3. Specific full-time players stay with specific teams (Ben and Barry).
-        //  4. Unaffiliated players can be assigned to any team.
-        //  5. Remaining full-time assignments next; then subs.
-        //  6. Each team has one goalie.
-        //  7. Team skill scores must be very close.
-        // ==============================================================
-        protected override void BuildTeamRoster()
-        // ==============================================================
-        {
-            //Console.WriteLine("Building the visiting team roster.");
-
-            _visitorRoster = new ArrayList();
-
-            // The visiting team is the "white" team
-            // Look to see which which players were on the home "black" team last week and make them the visiting "white" team this week
-            foreach (HockeyPlayer player in _availableFullTimePlayers)
-            {
-                // First get available full-time players associated with either Ben or Barry
-                if ((player.AssignedToTeam == false) &&
-                    (player.PlayerTeam != "Unaffiliated") &&    // Not unaffiliated means affiliated with either Ben or Barry
-                    (player.PlayerLastWeek == "Black"))         // Last week player was on the home "black" team
-
-                {
-                    if (player.PlayerPos != "Goalie")       // Save Goalies to the end
-                    {
-                        player.AssignedToTeam = true;
-                        player.PlayerLastWeek = "White";    // This week the player will be on the visiting "white" team
-                        _visitorRoster.Add(player);
-                    }
-                }
-            }
-
-        }
-
-        private ArrayList _visitorRoster;
     }
 }

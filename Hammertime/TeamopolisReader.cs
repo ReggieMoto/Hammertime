@@ -22,6 +22,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Collections;
 using System.Security;
+using System.Collections.Generic;
 
 namespace Hammertime
 {
@@ -40,12 +41,12 @@ namespace Hammertime
         }
 
         private static TeamopolisReader _teamopolisReader;  // Reader instance
-        private ArrayList _teamopolisAvailablePlayers;       // Available survey responders
+        private List<string> _teamopolisAvailablePlayers;       // Available survey responders
         private string _teamopolisUrl;
         private string _teamopolisSurveyUrl;
 
 
-        public ArrayList AvailablePlayers
+        public List<string> AvailablePlayers
         {
                 get { return _teamopolisAvailablePlayers; }
         }
@@ -55,7 +56,7 @@ namespace Hammertime
         // =====================================================
         {
             _teamopolisUrl = url;
-            _teamopolisAvailablePlayers = new ArrayList();
+            _teamopolisAvailablePlayers = new List<string>();
             TeamopolisSurveyResults();
         }
 

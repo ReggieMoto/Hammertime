@@ -92,6 +92,7 @@
     <Compile Include="MySqlDbConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TeamBalancer.cs" />
+    <Compile Include="TeamBuilder.cs" />
     <Compile Include="TeamopolisReader.cs" />
     <Compile Include="VisitorTeam.cs" />
   </ItemGroup>

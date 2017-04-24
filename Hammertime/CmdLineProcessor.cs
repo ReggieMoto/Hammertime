@@ -102,7 +102,8 @@ namespace Hammertime
                 }
 
                 if ((cki.KeyChar >= 'A' && cki.KeyChar <= 'Z') ||
-                    (cki.KeyChar >= 'a' && cki.KeyChar <= 'z'))
+                    (cki.KeyChar >= 'a' && cki.KeyChar <= 'z') ||
+                    (cki.KeyChar == '.' || cki.KeyChar == ' '))
                 {
                     sb.Append(cki.KeyChar);
                 }
@@ -364,6 +365,8 @@ namespace Hammertime
                     Console.WriteLine($"\tFulltime or sub: {dbPlayer.PlayerType}");
                     Console.WriteLine($"\tTeam affiliation: {dbPlayer.PlayerTeam}");
                     Console.WriteLine($"\tLast week jersey color: {dbPlayer.PlayerLastWeek}");
+                    Console.WriteLine($"\tCaptain: {dbPlayer.Captain}");
+                    Console.WriteLine($"\tAlternate captain: {dbPlayer.AltCaptain}");
                 }
                 else
                     Console.WriteLine($"Player {player} wasn't found in the db.");
@@ -440,8 +443,14 @@ namespace Hammertime
             string plyrSkillLevel = null;
             string canPlayGoalie = null;
             string playerType = null;
+            string teamAffiliation = null;
+            string jerseyLastWeek = null;
+            string isCaptain = null;
+            string isAltCaptain = null;
+
 
             bool goalie;
+            bool captain = false, altCaptain = false;
             HockeyPlayer.PlayerSkill skillLevel;
 
             // Log in to server
@@ -528,6 +537,52 @@ namespace Hammertime
                     } while ((playerType != "F") &&
                              (playerType != "S"));
 
+                    do
+                    {
+                        Console.Write("Is the player a captain? (Y/N) ");
+                        isCaptain = getKbdInput();
+                    } while ((isCaptain != "Y") &&
+                             (isCaptain != "N"));
+
+                    if (isCaptain == "N")
+                    {
+                        do
+                        {
+                            Console.Write("Is the player an alternate captain? (Y/N) ");
+                            isAltCaptain = getKbdInput();
+                        } while ((isAltCaptain != "Y") &&
+                                 (isAltCaptain != "N"));
+
+                        if (isAltCaptain == "Y")
+                            altCaptain = true;
+                    }
+                    else
+                        captain = true;
+
+                    do
+                    {
+                        Console.Write("Player's team affiliation, Unaffiliated ('U'), Ben ('B') or Jared ('J'): ");
+                        teamAffiliation = getKbdInput();
+                    } while ((teamAffiliation != "B") &&
+                            (teamAffiliation != "J") &&
+                            (teamAffiliation != "U"));
+
+                    if (teamAffiliation == "B") teamAffiliation = "Ben";
+                    else if (teamAffiliation == "J") teamAffiliation = "Jared";
+                    else teamAffiliation = "Unaffiliated";
+
+                    do
+                    {
+                        Console.Write("Player's Player's jersey color last week,  Black, White or Zed (B/W/Z): ");
+                        jerseyLastWeek = getKbdInput();
+                    } while ((jerseyLastWeek != "B") &&
+                            (jerseyLastWeek != "W") &&
+                            (jerseyLastWeek != "Z"));
+
+                    if (jerseyLastWeek == "B") jerseyLastWeek = "Black";
+                    else if (jerseyLastWeek == "W") jerseyLastWeek = "White";
+                    else jerseyLastWeek = "Zed";
+
                     Console.WriteLine();
                     Console.WriteLine($"Updating player {player}'s attributes in the db.");
                     Console.WriteLine($"{firstName} is a level {plyrSkillLevel} player who plays {position}.");
@@ -540,8 +595,10 @@ namespace Hammertime
                         position,
                         goalie,
                         playerType[0],
-                        "Unaffiliated",
-                        "Zed");
+                        teamAffiliation,
+                        jerseyLastWeek,
+                        captain,
+                        altCaptain);
 
                     updateStatus = dbConnection.Update(hockeyPlayer);
                     Console.WriteLine();
@@ -565,8 +622,11 @@ namespace Hammertime
             string canPlayGoalie = null;
             string playerType = null;
             string anotherPlayer = null;
+            string isAltCaptain = null;
+            string isCaptain = null;
 
             bool goalie;
+            bool captain = false, altCaptain = false;
             HockeyPlayer.PlayerSkill skillLevel;
 
             // Log in to server
@@ -636,6 +696,28 @@ namespace Hammertime
                     } while ((playerType != "F") &&
                              (playerType != "S"));
 
+                    do
+                    {
+                        Console.Write("Is the player a captain? (Y/N) ");
+                        isCaptain = getKbdInput();
+                    } while ((isCaptain != "Y") &&
+                             (isCaptain != "N"));
+
+                    if (isCaptain == "N")
+                    {
+                        do
+                        {
+                            Console.Write("Is the player an alternate captain? (Y/N) ");
+                            isAltCaptain = getKbdInput();
+                        } while ((isAltCaptain != "Y") &&
+                                 (isAltCaptain != "N"));
+
+                        if (isAltCaptain == "Y")
+                            altCaptain = true;
+                    }
+                    else
+                        captain = true;
+
                     Console.WriteLine();
                     Console.WriteLine($"About to add new player {firstName} {lastName} to the db.");
                     Console.WriteLine($"{firstName} is a level {plyrSkillLevel} player who plays {position}.");
@@ -649,7 +731,9 @@ namespace Hammertime
                         goalie,
                         playerType[0],
                         "Unaffiliated",
-                        "Zed");
+                        "Zed",
+                        captain,
+                        altCaptain);
 
                     newPlayerAdded = dbConnection.Insert(player);
                     Console.WriteLine();

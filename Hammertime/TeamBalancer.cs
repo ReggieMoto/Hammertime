@@ -212,9 +212,12 @@ namespace Hammertime
         // ==============================================================
         // Add goalies. Strong goalies to weaker teams.
         // ==============================================================
-        private void AddGoalies(HomeTeam home, VisitorTeam visitor)
+        private void AddGoalies()
         // ==============================================================
         {
+            HomeTeam home = HomeTeam.Instance;
+            VisitorTeam visitor = VisitorTeam.Instance;
+
             if (home.TeamScore >= visitor.TeamScore)
             {
                 home.AddAGoalie(true);
@@ -272,21 +275,26 @@ namespace Hammertime
             else if (strong.PlayerCount > weak.PlayerCount)
             {
                 // Try to move a D player from strong to weak
-                // If that can't happen, try to move a C player from strong to weak
+                Console.WriteLine("BalanceDifferential2: Try to move a D player from strong to weak");
                 HockeyPlayer player = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
 
-                // Perform the swap if the players are available
                 if (player == null)
+                {
+                    // If that can't happen, try to move a C player from strong to weak
+                    Console.WriteLine("BalanceDifferential2: Try to move a C player from strong to weak");
                     player = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
+                }
 
                 // Perform the swap if a player is available
                 if (player != null)
                 {
+                    Console.WriteLine("BalanceDifferential2: Perform the swap");
                     weak.AddAPlayer(player);
                     strong.RemoveAPlayer(player);
                 }
             }
         }
+
 
         // ==============================================================
         private void BalanceDifferential3(HockeyTeam strong, HockeyTeam weak)
@@ -326,15 +334,20 @@ namespace Hammertime
             {
                 // Try to move a D player from strong to weak
                 // If that can't happen, try to move a C player from strong to weak
+                Console.WriteLine("BalanceDifferential3: Try to move a D player from strong to weak");
                 HockeyPlayer player = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
 
                 // Perform the swap if the players are available
                 if (player == null)
+                {
+                    Console.WriteLine("BalanceDifferential3: Try to move a C player from strong to weak");
                     player = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
+                }
 
                 // Perform the swap if a player is available
                 if (player != null)
                 {
+                    Console.WriteLine("BalanceDifferential3: Perform the swap");
                     weak.AddAPlayer(player);
                     strong.RemoveAPlayer(player);
                 }
@@ -342,147 +355,260 @@ namespace Hammertime
         }
 
         // ==============================================================
-        // This is the second pass final balancer.
-        // It attempts to balance the teams based upon score and
-        // numbers of players on each roster.
-        // NOTE: This is pre-goalie. No goalies are added here.
-        // ==============================================================
-        public void FinalBalance(HomeTeam home, VisitorTeam visitor)
+        private void BalanceDifferential4(HockeyTeam strong, HockeyTeam weak)
         // ==============================================================
         {
-            int teamScoreDifferential = 0;
+            HockeyPlayer strongPlayer = null;
+            HockeyPlayer weakPlayer = null;
 
-            if (home.TeamScore > visitor.TeamScore)
+            if (strong.PlayerCount == weak.PlayerCount) // The player counts are equal so swap one for one
             {
-                teamScoreDifferential = home.TeamScore - visitor.TeamScore;
+                // These swaps are for unaffiliated players only
+                // Swap an A (4) with a C (2)
+                Console.WriteLine("BalanceDifferential4: Try to swap an A with a C");
+                strongPlayer = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
+                weakPlayer = weak.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
 
-                if (teamScoreDifferential == 3)
+                if (strongPlayer == null || weakPlayer == null)
                 {
-                    BalanceDifferential3(home, visitor);
+                    // If we can't do that try to swap a B (3) with a D (1)
+                    Console.WriteLine("BalanceDifferential4: Try to swap a B with a D");
+                    strongPlayer = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
+                    weakPlayer = weak.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
                 }
-                else if (teamScoreDifferential == 2)
+
+                // Perform the swap if the players are available
+                if (strongPlayer != null && weakPlayer != null)
                 {
-                    BalanceDifferential2(home, visitor);
+                    Console.WriteLine("BalanceDifferential4: Perform the swap");
+                    strong.AddAPlayer(weakPlayer);
+                    weak.AddAPlayer(strongPlayer);
+
+                    strong.RemoveAPlayer(strongPlayer);
+                    weak.RemoveAPlayer(weakPlayer);
                 }
             }
-            else if (visitor.TeamScore > home.TeamScore)
+            else if (strong.PlayerCount > weak.PlayerCount)
             {
+                // Try to move a C player from strong to weak
+                // If that can't happen, try to move a D player from strong to weak
+                Console.WriteLine("BalanceDifferential4: Try to move a C player from strong to weak");
+                HockeyPlayer player = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
 
-                teamScoreDifferential = visitor.TeamScore - home.TeamScore;
-
-                if (teamScoreDifferential == 3)
+                // Perform the swap if the players are available
+                if (player == null)
                 {
-                    BalanceDifferential3(visitor, home);
+                    Console.WriteLine("BalanceDifferential4: Try to move a D player from strong to weak");
+                    player = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
                 }
-                else if (teamScoreDifferential == 2)
+
+                // Perform the swap if a player is available
+                if (player != null)
                 {
-                    BalanceDifferential2(visitor, home);
+                    Console.WriteLine("BalanceDifferential4: Perform the swap");
+                    weak.AddAPlayer(player);
+                    strong.RemoveAPlayer(player);
                 }
             }
         }
 
         // ==============================================================
-        // This is the first pass coarse balancer.
-        // It uses the difference in specific players' skill levels
-        // to work out team rosters, attempting to balance based on
-        // similar numbers of skilled players per team.
-        // NOTE: Goalies are added after the final balance.
-        // ==============================================================
-        public void Balance(HomeTeam home, VisitorTeam visitor)
+        private void BalanceDifferential5(HockeyTeam strong, HockeyTeam weak)
         // ==============================================================
         {
-            bool moreAvailablePlayers = true;
-            int controlCounter = 0;
+            HockeyPlayer strongPlayer = null;
+            HockeyPlayer weakPlayer = null;
 
-            // As long as either team has less than 10 players and there are more available players
-            // Keep adding players. The team compositions and scores are factored in below.
-            while ((home.PlayerCount < 11 ||
-                visitor.PlayerCount < 11) &&
-                moreAvailablePlayers == true &&
-                controlCounter++ <= 20) // Emergency runaway shutoff
+            if (strong.PlayerCount == weak.PlayerCount) // The player counts are equal so swap one for one
             {
-                // Booleans to keep track of whether players have been added or not
-                bool addedToHome = false, addedToVisitor = false;
+                // These swaps are for unaffiliated players only
+                // Swap an A (4) with a C (2)
+                Console.WriteLine("BalanceDifferential5: Try to swap an A with a C");
+                strongPlayer = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
+                weakPlayer = weak.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
 
-                //Console.WriteLine($"Home team player count: {home.PlayerCount}");
-                //Console.WriteLine($"Visitor team player count: {visitor.PlayerCount}");
+                if (strongPlayer == null || weakPlayer == null)
+                {
+                    // If we can't do that try to swap a B (3) with a D (1)
+                    Console.WriteLine("BalanceDifferential5: Try to swap a B with a D");
+                    strongPlayer = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
+                    weakPlayer = weak.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
+                }
 
-                // Find which team has fewer players and begin adding to that team.
-                if (home.PlayerCount < visitor.PlayerCount)
+                // Perform the swap if the players are available
+                if (strongPlayer != null && weakPlayer != null)
                 {
-                    // The visiting team has more players.
-                    // Add a player to the home team
-                    if (visitor.TeamScore >= home.TeamScore)
-                    {
-                        // Added highest player available
-                        addedToHome = AddHigherSkillPlayer(home, SkillDifference(visitor.TeamComposition, home.TeamComposition), visitor.TeamScore - home.TeamScore);
-                    }
-                    else // (home.TeamScore > visitor.TeamScore)
-                    {
-                        // Add lowest player available
-                        addedToHome = AddLowerSkillPlayer(home, home.TeamScore - visitor.TeamScore);
-                    }
-                }
-                else if (home.PlayerCount > visitor.PlayerCount)
-                {
-                    // The home team has more players.
-                    // Add a player to the visitor team
-                    if (home.TeamScore >= visitor.TeamScore)
-                    {
-                        // Added highest player available
-                        addedToVisitor = AddHigherSkillPlayer(visitor, SkillDifference(home.TeamComposition, visitor.TeamComposition), home.TeamScore - visitor.TeamScore);
-                    }
-                    else // (visitor.TeamScore > home.TeamScore)
-                    {
-                        // Add lowest player available
-                        addedToVisitor = AddLowerSkillPlayer(visitor, visitor.TeamScore - home.TeamScore);
-                    }
-                }
-                else // (home.PlayerCount == visitor.PlayerCount)
-                {
-                    // Add a player to the home team
-                    if (visitor.TeamScore > home.TeamScore)
-                    {
-                        // Added highest player available
-                        addedToHome = AddHigherSkillPlayer(home, SkillDifference(visitor.TeamComposition, home.TeamComposition), visitor.TeamScore - home.TeamScore);
-                    }
-                    else if (home.TeamScore > visitor.TeamScore)
-                    {
-                        // Added highest player available
-                        addedToHome = AddHigherSkillPlayer(visitor, SkillDifference(home.TeamComposition, visitor.TeamComposition), home.TeamScore - visitor.TeamScore);
-                    }
-                    else // (home.TeamScore == visitor.TeamScore)
-                    {
-                        // Add lowest players available
-                        //Console.Write("Home team: ");
-                        addedToHome = AddLowerSkillPlayer(home, 0);
-                        //Console.Write("Visitor team: ");
-                        addedToVisitor = AddLowerSkillPlayer(visitor, 0);
-                    }
+                    Console.WriteLine("BalanceDifferential5: Perform the swap");
+                    strong.AddAPlayer(weakPlayer);
+                    weak.AddAPlayer(strongPlayer);
 
+                    strong.RemoveAPlayer(strongPlayer);
+                    weak.RemoveAPlayer(weakPlayer);
                 }
-                //Console.WriteLine();
-                if (addedToHome == false && addedToVisitor == false)
-                    moreAvailablePlayers = false;
             }
+            else if (strong.PlayerCount > weak.PlayerCount)
+            {
+                // Try to move a B player from strong to weak
+                // If that can't happen, try to move a C player from strong to weak
+                Console.WriteLine("BalanceDifferential5: Try to move a B player from strong to weak");
+                HockeyPlayer player = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
 
-            //Console.WriteLine($"Control counter: {controlCounter}.");
-            if (controlCounter > 20) throw (new TeamBalancerException("Error: Runaway Balance method."));
+                // Perform the swap if the players are available
+                if (player == null)
+                {
+                    Console.WriteLine("BalanceDifferential5: Try to move a C player from strong to weak");
+                    player = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
+                }
 
-            // Now that a coarse balance has been done, do a final balance to attempt to even out the teams
-            // if they aren't very even (scores are still off and/or player counts are off)
-            Console.WriteLine($"Balance: Finished coarse balance.");
-            Console.WriteLine($"Balance: home.PlayerCount    = {home.PlayerCount}");
-            Console.WriteLine($"Balance: visitor.PlayerCount = {visitor.PlayerCount}");
-            Console.WriteLine($"Balance: home.TeamScore    = {home.TeamScore}");
-            Console.WriteLine($"Balance: visitor.TeamScore = {visitor.TeamScore}");
+                // Perform the swap if a player is available
+                if (player != null)
+                {
+                    Console.WriteLine("BalanceDifferential5: Perform the swap");
+                    weak.AddAPlayer(player);
+                    strong.RemoveAPlayer(player);
+                }
+            }
+        }
 
-            if ((home.PlayerCount != visitor.PlayerCount) ||
-                (home.TeamScore != visitor.TeamScore))
-                FinalBalance(home, visitor);
-            
+        // ==============================================================
+        private void BalanceDifferential6(HockeyTeam strong, HockeyTeam weak)
+        // ==============================================================
+        {
+            HockeyPlayer strongPlayer = null;
+            HockeyPlayer weakPlayer = null;
+
+            if (strong.PlayerCount == weak.PlayerCount) // The player counts are equal so swap one for one
+            {
+                // These swaps are for unaffiliated players only
+                // Swap an A (4) with a D (1)
+                Console.WriteLine("BalanceDifferential6: Try to swap an A with a D");
+                strongPlayer = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
+                weakPlayer = weak.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
+
+                if (strongPlayer == null || weakPlayer == null)
+                {
+                    // If we can't do that try to swap an A (4) with a C (2)
+                    Console.WriteLine("BalanceDifferential6: Try to swap an A with a C");
+                    strongPlayer = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
+                    weakPlayer = weak.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
+                }
+
+                if (strongPlayer == null || weakPlayer == null)
+                {
+                    // If we can't do that try to swap a B (3) with a D (1)
+                    Console.WriteLine("BalanceDifferential6: Try to swap a B with a D");
+                    strongPlayer = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
+                    weakPlayer = weak.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
+                }
+
+                // Perform the swap if the players are available
+                if (strongPlayer != null && weakPlayer != null)
+                {
+                    Console.WriteLine("BalanceDifferential6: Perform the swap");
+                    strong.AddAPlayer(weakPlayer);
+                    weak.AddAPlayer(strongPlayer);
+
+                    strong.RemoveAPlayer(strongPlayer);
+                    weak.RemoveAPlayer(weakPlayer);
+                }
+            }
+            else if (strong.PlayerCount > weak.PlayerCount)
+            {
+                // Try to move a B player from strong to weak
+                // If that can't happen, try to move a C player from strong to weak
+                Console.WriteLine("BalanceDifferential6: Try to move a B player from strong to weak");
+                HockeyPlayer player = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
+
+                // Perform the swap if the players are available
+                if (player == null)
+                {
+                    Console.WriteLine("BalanceDifferential6: Try to move a C player from strong to weak");
+                    player = strong.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
+                }
+
+                // Perform the swap if a player is available
+                if (player != null)
+                {
+                    Console.WriteLine("BalanceDifferential3: Perform the swap");
+                    weak.AddAPlayer(player);
+                    strong.RemoveAPlayer(player);
+                }
+            }
+        }
+
+        // ==============================================================
+        // This is the team balancer.
+        // It attempts to balance the teams based upon score and
+        // numbers of players on each roster.
+        // NOTE: Goalies are added after the balance.
+        // ==============================================================
+        public void BalanceTeams()
+        // ==============================================================
+        {
+            HomeTeam home = HomeTeam.Instance;
+            VisitorTeam visitor = VisitorTeam.Instance;
+
+            Console.WriteLine($"Balancer: home.PlayerCount    = {home.PlayerCount}");
+            Console.WriteLine($"Balancer: visitor.PlayerCount = {visitor.PlayerCount}");
+            Console.WriteLine($"Balancer: home.TeamScore    = {home.TeamScore}");
+            Console.WriteLine($"Balancer: visitor.TeamScore = {visitor.TeamScore}");
+
+            int teamScoreDifferential = 0;
+            int runawayCatch = 0;
+
+            do
+            {
+                if (home.TeamScore > visitor.TeamScore)
+                {
+                    teamScoreDifferential = home.TeamScore - visitor.TeamScore;
+
+                    do
+                    {
+                        if (teamScoreDifferential >= 6)
+                            BalanceDifferential6(home, visitor);
+                        else if (teamScoreDifferential == 5)
+                            BalanceDifferential5(home, visitor);
+                        else if (teamScoreDifferential == 4)
+                            BalanceDifferential4(home, visitor);
+                        else if (teamScoreDifferential == 3)
+                            BalanceDifferential3(home, visitor);
+                        else if (teamScoreDifferential == 2)
+                            BalanceDifferential2(home, visitor);
+
+                        teamScoreDifferential = home.TeamScore - visitor.TeamScore;
+
+                    } while (teamScoreDifferential > 1 && runawayCatch++ < 5);
+
+                }
+                else if (visitor.TeamScore > home.TeamScore)
+                {
+                    teamScoreDifferential = visitor.TeamScore - home.TeamScore;
+
+                    do
+                    {
+                        if (teamScoreDifferential >= 6)
+                            BalanceDifferential6(visitor, home);
+                        else if (teamScoreDifferential == 5)
+                            BalanceDifferential5(visitor, home);
+                        else if (teamScoreDifferential == 4)
+                            BalanceDifferential4(visitor, home);
+                        else if (teamScoreDifferential == 3)
+                            BalanceDifferential3(visitor, home);
+                        else if (teamScoreDifferential == 2)
+                            BalanceDifferential2(visitor, home);
+
+                        teamScoreDifferential = visitor.TeamScore - home.TeamScore;
+                    }
+                    while (teamScoreDifferential > 1 && runawayCatch++ < 5);
+
+                }
+            } while (teamScoreDifferential > 1 && runawayCatch++ < 5);
+
+            if (runawayCatch == 3)
+                Console.WriteLine("TeamBalancer: Caught a runaway do/while loop.");
+
             // Final balancing has been done. Now add goalies.
-            AddGoalies(home, visitor);
+            AddGoalies();
         }
     }
 }

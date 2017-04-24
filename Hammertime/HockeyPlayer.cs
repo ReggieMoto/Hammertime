@@ -16,10 +16,12 @@
 // is obtained David Hammond.
 // ==============================================================
 
+using System;
+
 namespace Hammertime
 {
     // ====================
-    public class HockeyPlayer
+    public class HockeyPlayer : IComparable
     // ====================
     {
         public enum PlayerSkill
@@ -50,6 +52,8 @@ namespace Hammertime
         public string PlayerLastWeek { get; set; }      // White, Black, Zed (Didn't play)
         public bool AssignedToTeam { get; set; }        // Is the player assigned to a team yet
         public PlayerValue PlayerScore { get; set; }    // Derived from Skill Level
+        public bool Captain { get; set; }               // Is a team captain
+        public bool AltCaptain { get; set; }            // Is an alternate team captain
 
         // ==============================================================
         public HockeyPlayer(
@@ -61,7 +65,9 @@ namespace Hammertime
             bool player_goalie,
             char player_type,
             string player_team,
-            string player_last_wk)
+            string player_last_wk,
+            bool captain,
+            bool alt_captain)
         // ==============================================================
         {
             LastName = player_last_name;
@@ -72,6 +78,8 @@ namespace Hammertime
             PlayerType = player_type;
             PlayerTeam = player_team;
             PlayerLastWeek = player_last_wk;
+            Captain = captain;
+            AltCaptain = alt_captain;
             AssignedToTeam = false;
 
             switch (Level)
@@ -104,6 +112,8 @@ namespace Hammertime
             PlayerType = player.PlayerType;
             PlayerTeam = player.PlayerTeam;
             PlayerLastWeek = player.PlayerLastWeek;
+            Captain = player.Captain;
+            AltCaptain = player.AltCaptain;
             AssignedToTeam = player.AssignedToTeam;
             PlayerScore = player.PlayerScore;
         }
@@ -120,8 +130,27 @@ namespace Hammertime
             PlayerType = 'S';
             PlayerTeam = null;
             PlayerLastWeek = null;
+            Captain = false;
+            AltCaptain = false;
             AssignedToTeam = false;
             PlayerScore = PlayerValue.Level_Z;
+        }
+
+        public int CompareTo(object obj)
+        {
+            HockeyPlayer player = obj as HockeyPlayer;
+
+            if (player != null)
+            {
+                if (this.PlayerScore > player.PlayerScore)
+                    return 1;
+                else if (this.PlayerScore < player.PlayerScore)
+                    return -1;
+                else
+                    return 0;
+            }
+            else
+                throw new NotImplementedException();
         }
     }
 }

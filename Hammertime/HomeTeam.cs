@@ -16,12 +16,14 @@
 // is obtained David Hammond.
 // ==============================================================
 
-using System.Collections;
+using System.Collections.Generic;
 
 namespace Hammertime
 {
     public sealed class HomeTeam : HockeyTeam
     {
+        private static HomeTeam _homeTeam = null;
+
         // ==============================================================
         public static HomeTeam Instance
         // ==============================================================
@@ -34,14 +36,14 @@ namespace Hammertime
             }
         }
 
-        private static HomeTeam _homeTeam;
+        private List<HockeyPlayer> _homeRoster = null;
 
+        // ==============================================================
         private HomeTeam()
+        // ==============================================================
             : base(Residence.Home)
         {
-            // Base class: Attach to the DB server
-            // Base class: Build a roster from the server
-            BuildTeamRoster();
+            _homeRoster = new List<HockeyPlayer>();
         }
 
         // ==============================================================
@@ -85,8 +87,9 @@ namespace Hammertime
         // ==============================================================
         {
             //Console.WriteLine("AddAPlayer for the home team");
-            _homeRoster.Add(hockeyPlayer);
+            hockeyPlayer.AssignedToTeam = true;
             hockeyPlayer.PlayerLastWeek = "Black";    // This week the player will be on the home "black" team
+            _homeRoster.Add(hockeyPlayer);
         }
 
         // ==============================================================
@@ -94,6 +97,7 @@ namespace Hammertime
         // ==============================================================
         {
             //Console.WriteLine("RemoveAPlayer from the home team");
+            hockeyPlayer.AssignedToTeam = false;
             _homeRoster.Remove(hockeyPlayer);
         }
 
@@ -124,45 +128,5 @@ namespace Hammertime
             //Console.WriteLine("AddASkillPlayer for the home team");
             return AddAGoalie(_homeRoster, strongerTeam);
         }
-
-        // ==============================================================
-        //  Rules of the road for generating a team roster:
-        //  1. Which players are available? From the survey and base class contains lists.
-        //  2. No more than 10(S)+1(G) players per team.
-        //  3. Specific full-time players stay with specific teams (Ben and Barry).
-        //  4. Unaffiliated players can be assigned to any team.
-        //  5. Remaining full-time assignments next; then subs.
-        //  6. Each team has one goalie.
-        //  7. Team skill scores must be very close.
-        // ==============================================================
-        protected override void BuildTeamRoster()
-        // ==============================================================
-        {
-            //Console.WriteLine("Building the home team roster.");
-
-            _homeRoster = new ArrayList();
-
-            // The home team is the "black" team
-            // Look to see which which full-time players were on the visiting "white" team last week and make them the home "black" team this week
-
-            foreach (HockeyPlayer player in _availableFullTimePlayers)
-            {
-                // First get available full-time players associated with either Ben or Barry
-                if ((player.AssignedToTeam == false) &&
-                    (player.PlayerTeam != "Unaffiliated") &&    // Not unaffiliated means affiliated with either Ben or Barry
-                    (player.PlayerLastWeek == "White"))         // Last week player was on the visiting "white" team
-
-                {
-                    if (player.PlayerPos != "Goalie")       // Save Goalies to the end
-                    {
-                        player.AssignedToTeam = true;
-                        player.PlayerLastWeek = "Black";    // This week the player will be on the home "black" team
-                        _homeRoster.Add(player);
-                    }
-                }
-            }
-        }
-
-        private ArrayList _homeRoster;
     }
 }

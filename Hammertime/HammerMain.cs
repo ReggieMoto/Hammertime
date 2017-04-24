@@ -80,38 +80,20 @@ namespace Hammertime
                 // Parse command line args
                 CmdLineProcessor.getInstance().Parse(args);
 
+                TeamBuilder.Instance.BuildTeams();
+
                 try
                 {
-                    // Log in to server
-                    DbConnection dbConnection = HammerMainDb.getInstance();
+                    TeamBalancer.Instance.BalanceTeams();
+                    HomeTeam.Instance.PrintHomeTeamRoster();
+                    VisitorTeam.Instance.PrintVisitingTeamRoster();
 
-                    if (dbConnection.Connected())
-                    {
-                        HomeTeam white = HomeTeam.Instance;
-                        VisitorTeam dark = VisitorTeam.Instance;
-                        TeamBalancer balancer = TeamBalancer.Instance;
-
-                        try
-                        {
-                            balancer.Balance(white, dark);
-
-                            white.PrintHomeTeamRoster();
-                            dark.PrintVisitingTeamRoster();
-
-                            if (SaveTeams == true && HockeyTeam.SaveTeams() == false)
-                                throw (new HammerMainException("Error: Unable to update database with this week's team assignments."));
-                        }
-                        catch (TeamBalancerException ex)
-                        {
-                            Console.WriteLine($"Error running TeamBalancer: {ex.Message}");
-                        }
-                    }
+                    if (SaveTeams == true && TeamBuilder.SaveTeams() == false)
+                        throw (new HammerMainException("Error: Unable to update database with this week's team assignments."));
                 }
-                catch (HammerMainException ex)
+                catch (TeamBalancerException ex)
                 {
-                    Console.WriteLine();
-                    Console.WriteLine($"{ex.Message}");
-                    Console.WriteLine();
+                    Console.WriteLine($"Error running TeamBalancer: {ex.Message}");
                 }
             }
             catch (CmdLineProcessorException ex)

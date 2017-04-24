@@ -17,7 +17,7 @@
 // ==============================================================
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Hammertime
@@ -57,10 +57,10 @@ namespace Hammertime
         // 2. If so, open it for reading.
         // 3. If not throw an exception.
         // ==============================================================
-        public ArrayList ReadAvailablePlayers()
+        public List<string> ReadAvailablePlayers()
         // ==============================================================
         {
-            ArrayList availablePlayers = new ArrayList();
+            List<string> availablePlayers = new List<string>();
 
             string filenamePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             filenamePath += filenameSubdir;
@@ -101,7 +101,7 @@ namespace Hammertime
         }
 
         // ==============================================================
-        public void WriteAvailablePlayers(ArrayList availablePlayers)
+        public void WriteAvailablePlayers(List<string> availablePlayers)
         // ==============================================================
         {
             string filenamePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);

@@ -38,7 +38,9 @@ namespace Hammertime
             bool player_goalie,
             char player_type,
             string player_team,
-            string player_last_wk) : base(
+            string player_last_wk,
+            bool captain,
+            bool alt_captain) : base(
                 player_last_name,
                 player_first_name,
                 player_level,
@@ -46,7 +48,9 @@ namespace Hammertime
                 player_goalie,
                 player_type,
                 player_team,
-                player_last_wk)
+                player_last_wk,
+                captain,
+                alt_captain)
         {
             PlayerId = player_id; // MySql specific
         }
@@ -319,6 +323,8 @@ namespace Hammertime
                     var type = dataReader["player_type"] + "";
                     var team = dataReader["player_team"] + "";
                     var lastWeek = dataReader["player_last_wk"] + "";
+                    var captain = dataReader["captain"] + "";
+                    var altCaptain = dataReader["alt_captain"] + "";
 
                     int playerId;
                     int.TryParse(index, out playerId);
@@ -337,7 +343,13 @@ namespace Hammertime
                     if (goalie == "Y")
                         canPlayGoalie = true;
 
-                    player = new MySqlDbHockeyPlayer(playerId, lastName, firstName, skillLevel, position, canPlayGoalie, type[0], team, lastWeek);
+                    bool isCaptain = false, isAltCaptain = false;
+                    if (captain == "Y")
+                        isCaptain = true;
+                    if (altCaptain == "Y")
+                        isAltCaptain = true;
+
+                    player = new MySqlDbHockeyPlayer(playerId, lastName, firstName, skillLevel, position, canPlayGoalie, type[0], team, lastWeek, isCaptain, isAltCaptain);
                 }
 
                 CloseConnection();
@@ -373,6 +385,8 @@ namespace Hammertime
                     var type = dataReader["player_type"] + "";
                     var team = dataReader["player_team"] + "";
                     var lastWeek = dataReader["player_last_wk"] + "";
+                    var captain = dataReader["captain"] + "";
+                    var altCaptain = dataReader["alt_captain"] + "";
 
                     int playerId;
                     int.TryParse(index, out playerId);
@@ -391,7 +405,14 @@ namespace Hammertime
                     if (goalie == "Y")
                         canPlayGoalie = true;
 
-                    playerList.Add(new MySqlDbHockeyPlayer(playerId, lastName, firstName, skillLevel, position, canPlayGoalie, type[0], team, lastWeek));
+                    bool isCaptain = false, isAltCaptain = false;
+                    if (captain == "Y")
+                        isCaptain = true;
+                    if (altCaptain == "Y")
+                        isAltCaptain = true;
+
+
+                    playerList.Add(new MySqlDbHockeyPlayer(playerId, lastName, firstName, skillLevel, position, canPlayGoalie, type[0], team, lastWeek, isCaptain, isAltCaptain));
                 }
 
                 CloseConnection();

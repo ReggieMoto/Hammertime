@@ -43,7 +43,9 @@ namespace Hammertime
             bool player_goalie,
             char player_type,
             string player_team,
-            string player_last_wk) : base(
+            string player_last_wk,
+            bool captain,
+            bool alt_captain) : base(
                 player_last_name,
                 player_first_name,
                 player_level,
@@ -51,7 +53,9 @@ namespace Hammertime
                 player_goalie,
                 player_type,
                 player_team,
-                player_last_wk)
+                player_last_wk,
+                captain,
+                alt_captain)
         {
             _id = player_id;    // MongoDb specific
         }

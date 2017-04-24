@@ -26,24 +26,19 @@
 // ==============================================================
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Hammertime
 {
     public abstract class HockeyTeam
     {
-        protected static ArrayList _availableFullTimePlayers;
-        protected static ArrayList _availableSubPlayers;
-
         public enum Residence
         {
             Home,
             Away
         }
 
-        public int FullTimePlayerCount  { get { return _availableFullTimePlayers.Count; } }
-        public int SubPlayerCount       { get { return _availableSubPlayers.Count; } }
         public Residence Location       { get; set; }
         private static bool RostersInitialized { get; set; }
 
@@ -54,28 +49,7 @@ namespace Hammertime
             // Establish home/away (white/dark)
             Location = residence;
             // Build the available player rosters from Teamopolis
-            BuildAvailablePlayerRosters();
-        }
-
-        // ==============================================================
-        public static bool SaveTeams()
-        // ==============================================================
-        {
-            bool teamsSaved = false;
-
-            DbConnection connection = HammerMainDb.getInstance();
-
-            var query = from HockeyPlayer player in _availableFullTimePlayers select player;
-            foreach (HockeyPlayer player in query)
-            {
-                teamsSaved = connection.Update(player);
-                if (teamsSaved == false) break;
-            }
-
-            if (teamsSaved == true)
-                Console.WriteLine("\nTeams written to the database.\n");
-
-            return teamsSaved;
+            //BuildAvailablePlayerRosters();
         }
 
         // ==============================================================
@@ -113,7 +87,7 @@ namespace Hammertime
 
         }
         // ==============================================================
-        protected int[] TeamComposition(ArrayList teamRoster)
+        protected int[] TeamComposition(List<HockeyPlayer> teamRoster)
         // ==============================================================
         {
             int[] composition = new int[] { 0, 0, 0, 0 };
@@ -146,7 +120,7 @@ namespace Hammertime
 
 
         // ==============================================================
-        protected int TeamScore(ArrayList teamRoster)
+        protected int TeamScore(List<HockeyPlayer> teamRoster)
         // ==============================================================
         {
             int score = 0;
@@ -178,7 +152,7 @@ namespace Hammertime
         }
 
         // ==============================================================
-        protected void PrintTeamRoster(ArrayList teamRoster)
+        protected void PrintTeamRoster(List<HockeyPlayer> teamRoster)
         // ==============================================================
         {
             string formatString = "{0,22}{1,10} |{2,7} |{3,10} |{4,15}";
@@ -257,12 +231,12 @@ namespace Hammertime
         // ==============================================================
         public abstract bool AddAGoalie(bool strongTeam);   // Provided in team classes
         // ==============================================================
-        protected bool AddAGoalie(ArrayList teamRoster, bool strongTeam)    // Called from team classes
+        protected bool AddAGoalie(List<HockeyPlayer> teamRoster, bool strongTeam)    // Called from team classes
         // ==============================================================
         {
             bool goalieAdded = false;
 
-            var query = from HockeyPlayer player in _availableFullTimePlayers
+            var query = from HockeyPlayer player in TeamBuilder.Instance.GetAvailableFullTimePlayers()
                         select player;
 
             foreach (HockeyPlayer player in query)
@@ -286,7 +260,7 @@ namespace Hammertime
 
             if (goalieAdded == false)
             {
-                query = from HockeyPlayer player in _availableSubPlayers
+                query = from HockeyPlayer player in TeamBuilder.Instance.GetAvailableSubPlayers()
                         select player;
 
                 foreach (HockeyPlayer player in query)
@@ -318,12 +292,12 @@ namespace Hammertime
         // ==============================================================
         public abstract bool AddASkillPlayer(HockeyPlayer.PlayerSkill skillLevel);  // Provided in team classes
         // ==============================================================
-        protected bool AddASkillPlayer(ArrayList teamRoster, HockeyPlayer.PlayerSkill skillLevel)    // Called from team classes
+        protected bool AddASkillPlayer(List<HockeyPlayer> teamRoster, HockeyPlayer.PlayerSkill skillLevel)    // Called from team classes
         // ==============================================================
         {
             bool playerAdded = false;
 
-            var query = from HockeyPlayer player in _availableFullTimePlayers
+            var query = from HockeyPlayer player in TeamBuilder.Instance.GetAvailableFullTimePlayers()
                         select player;
 
             foreach (HockeyPlayer player in query)
@@ -348,7 +322,7 @@ namespace Hammertime
 
             if (playerAdded == false)
             {
-                query = from HockeyPlayer player in _availableSubPlayers
+                query = from HockeyPlayer player in TeamBuilder.Instance.GetAvailableSubPlayers()
                         select player;
 
                 foreach (HockeyPlayer player in query)
@@ -371,40 +345,8 @@ namespace Hammertime
         }
 
         // ==============================================================
-        // Abstract method to build team roster based on residence (home/away)
-        protected abstract void BuildTeamRoster();
-
-        // ==============================================================
         // Abstract property to get count of players on roster (home/away)
         public abstract int PlayerCount { get; }
 
-        // ==============================================================
-        private void BuildAvailablePlayerRosters()
-        // ==============================================================
-        {
-            if (RostersInitialized == false)
-            {
-                //Console.WriteLine("Building the master roster.");
-                _availableFullTimePlayers = new ArrayList();
-                _availableSubPlayers = new ArrayList();
-
-                DbConnection myDbConnection = HammerMainDb.getInstance();
-                ArrayList _availablePlayers = TeamopolisReader.Instance.AvailablePlayers;
-
-                foreach (string player in _availablePlayers)
-                {
-                    HockeyPlayer dbPlayer = myDbConnection.Read(player);
-                    if (dbPlayer != null)
-                    {
-                        if (dbPlayer.PlayerType == 'F')
-                            _availableFullTimePlayers.Add(dbPlayer);
-                        else
-                            _availableSubPlayers.Add(dbPlayer);
-                    }
-                }
-
-                RostersInitialized = true;
-            }
-        }
     }
 }
