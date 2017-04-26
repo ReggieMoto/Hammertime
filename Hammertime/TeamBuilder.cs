@@ -191,90 +191,110 @@ namespace Hammertime
                 TeamAssign(player);
 
             // ==============================================================
-            // Defense
+            // End of the captains. Now for the players.
             // ==============================================================
-            query = from player in _availableFullTimePlayers
-                    where player.Captain != true            // Not Captain
-                    where player.AltCaptain != true         // Not Alt Captain
-                    where player.PlayerPos == "Defense"
-                    where player.Level == HockeyPlayer.PlayerSkill.Level_A
-                    select player;
+            bool singleList = true;
 
-            foreach (var player in query)
-                TeamAssign(player);
+            if (singleList == true)
+            {
+                query = from player in _availableFullTimePlayers
+                        where player.Captain != true        // Not Captain
+                        where player.AltCaptain != true     // Not Alt Captain
+                        where player.PlayerPos != "Goalie"  // Not a goalie
+                        select player;
 
-            query = from player in _availableFullTimePlayers
-                    where player.Captain != true            // Not Captain
-                    where player.AltCaptain != true         // Not Alt Captain
-                    where player.PlayerPos == "Defense"
-                    where player.Level == HockeyPlayer.PlayerSkill.Level_B
-                    select player;
+                foreach (var player in query)
+                    TeamAssign(player);
+            }
+            else
+            {
+                // ==============================================================
+                // Defense
+                // ==============================================================
+                query = from player in _availableFullTimePlayers
+                        where player.Captain != true            // Not Captain
+                        where player.AltCaptain != true         // Not Alt Captain
+                        where player.PlayerPos == "Defense"
+                        where player.Level == HockeyPlayer.PlayerSkill.Level_A
+                        select player;
 
-            foreach (var player in query)
-                TeamAssign(player);
+                foreach (var player in query)
+                    TeamAssign(player);
 
-            query = from player in _availableFullTimePlayers
-                    where player.Captain != true            // Not Captain
-                    where player.AltCaptain != true         // Not Alt Captain
-                    where player.PlayerPos == "Defense"
-                    where player.Level == HockeyPlayer.PlayerSkill.Level_C
-                    select player;
+                query = from player in _availableFullTimePlayers
+                        where player.Captain != true            // Not Captain
+                        where player.AltCaptain != true         // Not Alt Captain
+                        where player.PlayerPos == "Defense"
+                        where player.Level == HockeyPlayer.PlayerSkill.Level_B
+                        select player;
 
-            foreach (var player in query)
-                TeamAssign(player);
+                foreach (var player in query)
+                    TeamAssign(player);
 
-            query = from player in _availableFullTimePlayers
-                    where player.Captain != true            // Not Captain
-                    where player.AltCaptain != true         // Not Alt Captain
-                    where player.PlayerPos == "Defense"
-                    where player.Level == HockeyPlayer.PlayerSkill.Level_D
-                    select player;
+                query = from player in _availableFullTimePlayers
+                        where player.Captain != true            // Not Captain
+                        where player.AltCaptain != true         // Not Alt Captain
+                        where player.PlayerPos == "Defense"
+                        where player.Level == HockeyPlayer.PlayerSkill.Level_C
+                        select player;
 
-            foreach (var player in query)
-                TeamAssign(player);
+                foreach (var player in query)
+                    TeamAssign(player);
 
-            // ==============================================================
-            // Forwards
-            // ==============================================================
-            query = from player in _availableFullTimePlayers
-                    where player.Captain != true            // Not Captain
-                    where player.AltCaptain != true         // Not Alt Captain
-                    where player.PlayerPos == "Forward"
-                    where player.Level == HockeyPlayer.PlayerSkill.Level_A
-                    select player;
+                query = from player in _availableFullTimePlayers
+                        where player.Captain != true            // Not Captain
+                        where player.AltCaptain != true         // Not Alt Captain
+                        where player.PlayerPos == "Defense"
+                        where player.Level == HockeyPlayer.PlayerSkill.Level_D
+                        select player;
 
-            foreach (var player in query)
-                TeamAssign(player);
+                foreach (var player in query)
+                    TeamAssign(player);
 
-            query = from player in _availableFullTimePlayers
-                    where player.Captain != true            // Not Captain
-                    where player.AltCaptain != true         // Not Alt Captain
-                    where player.PlayerPos == "Forward"
-                    where player.Level == HockeyPlayer.PlayerSkill.Level_B
-                    select player;
+                // ==============================================================
+                // Forwards
+                // ==============================================================
+                query = from player in _availableFullTimePlayers
+                        where player.Captain != true            // Not Captain
+                        where player.AltCaptain != true         // Not Alt Captain
+                        where player.PlayerPos == "Forward"
+                        where player.Level == HockeyPlayer.PlayerSkill.Level_A
+                        select player;
 
-            foreach (var player in query)
-                TeamAssign(player);
+                foreach (var player in query)
+                    TeamAssign(player);
 
-            query = from player in _availableFullTimePlayers
-                    where player.Captain != true            // Not Captain
-                    where player.AltCaptain != true         // Not Alt Captain
-                    where player.PlayerPos == "Forward"
-                    where player.Level == HockeyPlayer.PlayerSkill.Level_C
-                    select player;
+                query = from player in _availableFullTimePlayers
+                        where player.Captain != true            // Not Captain
+                        where player.AltCaptain != true         // Not Alt Captain
+                        where player.PlayerPos == "Forward"
+                        where player.Level == HockeyPlayer.PlayerSkill.Level_B
+                        select player;
 
-            foreach (var player in query)
-                TeamAssign(player);
+                foreach (var player in query)
+                    TeamAssign(player);
 
-            query = from player in _availableFullTimePlayers
-                    where player.Captain != true            // Not Captain
-                    where player.AltCaptain != true         // Not Alt Captain
-                    where player.PlayerPos == "Forward"
-                    where player.Level == HockeyPlayer.PlayerSkill.Level_D
-                    select player;
+                query = from player in _availableFullTimePlayers
+                        where player.Captain != true            // Not Captain
+                        where player.AltCaptain != true         // Not Alt Captain
+                        where player.PlayerPos == "Forward"
+                        where player.Level == HockeyPlayer.PlayerSkill.Level_C
+                        select player;
 
-            foreach (var player in query)
-                TeamAssign(player);
+                foreach (var player in query)
+                    TeamAssign(player);
+
+                query = from player in _availableFullTimePlayers
+                        where player.Captain != true            // Not Captain
+                        where player.AltCaptain != true         // Not Alt Captain
+                        where player.PlayerPos == "Forward"
+                        where player.Level == HockeyPlayer.PlayerSkill.Level_D
+                        select player;
+
+                foreach (var player in query)
+                    TeamAssign(player);
+
+            }
 
             foreach (HockeyPlayer player in _availableSubPlayers)
                 TeamAssign(player);

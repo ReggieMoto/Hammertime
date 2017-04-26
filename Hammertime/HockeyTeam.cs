@@ -53,41 +53,12 @@ namespace Hammertime
         }
 
         // ==============================================================
-        public static HockeyTeam StrongerTeam(HomeTeam home, VisitorTeam visitor)
-        // ==============================================================
+        public abstract int[] TeamComposition
         {
-            int[] homeComposition = home.TeamComposition;
-            int[] VisitorComposition = visitor.TeamComposition;
-
-            if (homeComposition[0] == VisitorComposition[0])
-            {
-                if (homeComposition[1] == VisitorComposition[1])
-                {
-                    if (homeComposition[2] == VisitorComposition[2])
-                    {
-                        if (homeComposition[3] >= VisitorComposition[3])
-                            return home;
-                        else
-                            return visitor;
-                    }
-                    else if (homeComposition[2] > VisitorComposition[2])
-                        return home;
-                    else
-                        return visitor;
-                }
-                else if (homeComposition[1] > VisitorComposition[1])
-                    return home;
-                else
-                    return visitor;
-            }
-            else if (homeComposition[0] > VisitorComposition[0])
-                return home;
-            else
-                return visitor;
-
+            get;
         }
-        // ==============================================================
-        protected int[] TeamComposition(List<HockeyPlayer> teamRoster)
+
+        protected int[] GetTeamComposition(List<HockeyPlayer> teamRoster)
         // ==============================================================
         {
             int[] composition = new int[] { 0, 0, 0, 0 };
@@ -120,7 +91,12 @@ namespace Hammertime
 
 
         // ==============================================================
-        protected int TeamScore(List<HockeyPlayer> teamRoster)
+        public abstract int TeamScore
+        {
+            get;
+        }
+
+        protected int GetTeamScore(List<HockeyPlayer> teamRoster)
         // ==============================================================
         {
             int score = 0;
@@ -152,6 +128,8 @@ namespace Hammertime
         }
 
         // ==============================================================
+        public abstract void PrintRoster();
+
         protected void PrintTeamRoster(List<HockeyPlayer> teamRoster)
         // ==============================================================
         {
@@ -202,9 +180,9 @@ namespace Hammertime
             }
 
             Console.WriteLine();
-            int[] teamComposition = TeamComposition(teamRoster);
+            int[] teamComposition = TeamComposition;
             Console.WriteLine($"Team talent composition: {teamComposition[0]}{teamComposition[1]}{teamComposition[2]}{teamComposition[3]}");
-            Console.WriteLine($"Team talent score: {TeamScore(teamRoster)}");
+            Console.WriteLine($"Team talent score: {TeamScore}");
             Console.WriteLine();
         }
 

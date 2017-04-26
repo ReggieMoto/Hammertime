@@ -77,24 +77,33 @@ namespace Hammertime
             try
             {
                 // What does the user want to do?
-                // Parse command line args
                 CmdLineProcessor.getInstance().Parse(args);
-
-                TeamBuilder.Instance.BuildTeams();
 
                 try
                 {
-                    TeamBalancer.Instance.BalanceTeams();
-                    HomeTeam.Instance.PrintHomeTeamRoster();
-                    VisitorTeam.Instance.PrintVisitingTeamRoster();
+                    // Get the available players and assemble two teams
+                    TeamBuilder.Instance.BuildTeams();
 
-                    if (SaveTeams == true && TeamBuilder.SaveTeams() == false)
-                        throw (new HammerMainException("Error: Unable to update database with this week's team assignments."));
+                    try
+                    {
+                        TeamBalancer.Instance.Balance();
+
+                        HomeTeam.Instance.PrintRoster();
+                        VisitorTeam.Instance.PrintRoster();
+
+                        if (SaveTeams == true && TeamBuilder.SaveTeams() == false)
+                            throw (new HammerMainException("Error: Unable to update database with this week's team assignments."));
+                    }
+                    catch (TeamBalancerException ex)
+                    {
+                        Console.WriteLine($"Error running TeamBalancer: {ex.Message}");
+                    }
                 }
-                catch (TeamBalancerException ex)
+                catch (TeamBuilderException ex)
                 {
-                    Console.WriteLine($"Error running TeamBalancer: {ex.Message}");
+                    Console.WriteLine($"Error running TeamBuilder: {ex.Message}");
                 }
+
             }
             catch (CmdLineProcessorException ex)
             {

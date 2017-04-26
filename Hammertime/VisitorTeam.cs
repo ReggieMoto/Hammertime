@@ -47,24 +47,17 @@ namespace Hammertime
         }
 
         // ==============================================================
-        public void PrintVisitingTeamRoster()
+        public override int[] TeamComposition
         // ==============================================================
         {
-            PrintTeamRoster(_visitorRoster);
+            get { return GetTeamComposition(_visitorRoster); }
         }
 
         // ==============================================================
-        public new int TeamScore
+        public override int TeamScore
         // ==============================================================
         {
-            get { return TeamScore(_visitorRoster); }
-        }
-
-        // ==============================================================
-        public new int[] TeamComposition
-        // ==============================================================
-        {
-            get { return TeamComposition(_visitorRoster); }
+            get { return GetTeamScore(_visitorRoster); }
         }
 
         // ==============================================================
@@ -72,6 +65,13 @@ namespace Hammertime
         // ==============================================================
         {
             get { return _visitorRoster.Count; }
+        }
+
+        // ==============================================================
+        public override void PrintRoster()
+        // ==============================================================
+        {
+            PrintTeamRoster(_visitorRoster);
         }
 
         // ==============================================================
