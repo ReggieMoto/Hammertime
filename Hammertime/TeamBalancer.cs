@@ -17,6 +17,8 @@
 // ==============================================================
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Hammertime
 {
@@ -204,7 +206,7 @@ namespace Hammertime
         }
 
         // ==============================================================
-        private void BalanceTeams(HockeyTeam strongTeam, HockeyTeam weakTeam)
+        private void Balance(HockeyTeam strongTeam, HockeyTeam weakTeam)
         // ==============================================================
         {
             HockeyPlayer strongPlayer = null;
@@ -355,14 +357,15 @@ namespace Hammertime
 
             if (home.TeamScore >= visitor.TeamScore)
             {
-                BalanceTeams(home, visitor);
+                Balance(home, visitor); // Balance the skill levels across the teams
+
                 // Now that teams are balanced add goalies
                 home.AddAGoalie(true); // Strong team
                 visitor.AddAGoalie(false);
             }
             else
             {
-                BalanceTeams(visitor, home);
+                Balance(visitor, home);
                 // Now that teams are balanced add goalies
                 visitor.AddAGoalie(true); // Strong team
                 home.AddAGoalie(false);
