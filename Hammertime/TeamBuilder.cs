@@ -150,26 +150,42 @@ namespace Hammertime
                     switch (player.Level)
                     {
                         case HockeyPlayer.PlayerSkill.Level_A:
+                            /*
                             if ((homeTeamComp[0] < awayTeamComp[0]) &&
                                 (home.TeamScore < away.TeamScore))
+                                */
+                            if ((homeTeamComp[0] < awayTeamComp[0]) &&
+                                (home.PlayerCount < away.PlayerCount))
                                 assignHome = true;
                             break;
 
                         case HockeyPlayer.PlayerSkill.Level_B:
+                            /*
                             if ((homeTeamComp[1] < awayTeamComp[1]) &&
                                 (home.TeamScore < away.TeamScore))
+                                */
+                            if ((homeTeamComp[1] < awayTeamComp[1]) &&
+                                (home.PlayerCount < away.PlayerCount))
                                 assignHome = true;
                             break;
 
                         case HockeyPlayer.PlayerSkill.Level_C:
+                            /*
                             if ((homeTeamComp[2] < awayTeamComp[2]) &&
-                                (home.TeamScore < away.TeamScore))
+                                (home.PlayerCount < away.PlayerCount))
+                                */
+                            if ((homeTeamComp[2] < awayTeamComp[2]) &&
+                                (home.PlayerCount < away.PlayerCount))
                                 assignHome = true;
                             break;
 
                         case HockeyPlayer.PlayerSkill.Level_D:
+                            /*
                             if ((homeTeamComp[3] < awayTeamComp[3]) &&
                                 (home.TeamScore < away.TeamScore))
+                                */
+                            if ((homeTeamComp[3] < awayTeamComp[3]) &&
+                                (home.PlayerCount < away.PlayerCount))
                                 assignHome = true;
                             break;
                     }
@@ -313,7 +329,8 @@ namespace Hammertime
             // Subs
             // ==============================================================
             foreach (HockeyPlayer player in _availableSubPlayers)
-                TeamAssign(player);
+                if (player.PlayerPos != "Goalie")
+                    TeamAssign(player);
         }
 
         // ==============================================================

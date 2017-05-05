@@ -218,14 +218,27 @@ namespace Hammertime
             {
                 switch (teamScoreDifferential / 2)
                 {
-                    case 4: // No swap; move an A
-                        Console.WriteLine("BalanceDifferential8: Try to move an A player from strong to weak");
+                    case 5: // No swap; move an A
+                        Console.WriteLine("BalanceDifferential11/10: Try to move an A player from strong to weak");
                         HockeyPlayer player = strongTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
 
                         // Perform the swap if a player is available
                         if (player != null)
                         {
-                            Console.WriteLine("BalanceDifferential8: Perform the move");
+                            Console.WriteLine("BalanceDifferential11/10: Perform the move");
+                            weakTeam.AddAPlayer(player);
+                            strongTeam.RemoveAPlayer(player);
+                        }
+                        break;
+
+                    case 4: // No swap; move an A
+                        Console.WriteLine("BalanceDifferential9/8: Try to move an A player from strong to weak");
+                        player = strongTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
+
+                        // Perform the swap if a player is available
+                        if (player != null)
+                        {
+                            Console.WriteLine("BalanceDifferential9/8: Perform the move");
                             weakTeam.AddAPlayer(player);
                             strongTeam.RemoveAPlayer(player);
                         }
@@ -292,12 +305,22 @@ namespace Hammertime
 
                 switch (teamScoreDifferential / 2)
                 {
-                    case 4:
-                        Console.WriteLine("BalanceDifferential8: Try to move an A player from strong to weak");
+                    case 5:
+                        Console.WriteLine("BalanceDifferential11/10: Try to move an A player from strong to weak");
                         player = strongTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
                         if (player == null)
                         {
-                            Console.WriteLine("BalanceDifferential8: Try to move a B player from strong to weak");
+                            Console.WriteLine("BalanceDifferential11/10: Try to move a B player from strong to weak");
+                            player = strongTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
+                        }
+                        break;
+
+                    case 4:
+                        Console.WriteLine("BalanceDifferential9/8: Try to move an A player from strong to weak");
+                        player = strongTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
+                        if (player == null)
+                        {
+                            Console.WriteLine("BalanceDifferential9/8: Try to move a B player from strong to weak");
                             player = strongTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
                         }
                         break;
@@ -355,18 +378,33 @@ namespace Hammertime
             Console.WriteLine($"Balancer: home.TeamScore    = {home.TeamScore}");
             Console.WriteLine($"Balancer: visitor.TeamScore = {visitor.TeamScore}");
 
+            int teamScoreDiff = 0;
+            int runaway = 0;
+
+            do
+            {
+                if (home.TeamScore >= visitor.TeamScore)
+                    Balance(home, visitor);
+                else
+                    Balance(visitor, home);
+
+                if (home.TeamScore >= visitor.TeamScore)
+                    teamScoreDiff = home.TeamScore - visitor.TeamScore;
+                else
+                    teamScoreDiff = visitor.TeamScore - home.TeamScore;
+
+            } while (teamScoreDiff > 1 && runaway++ < 5);
+
+            if (runaway >= 5)
+                Console.WriteLine("Runaway halted.");
+
             if (home.TeamScore >= visitor.TeamScore)
             {
-                Balance(home, visitor); // Balance the skill levels across the teams
-
-                // Now that teams are balanced add goalies
                 home.AddAGoalie(true); // Strong team
                 visitor.AddAGoalie(false);
             }
             else
             {
-                Balance(visitor, home);
-                // Now that teams are balanced add goalies
                 visitor.AddAGoalie(true); // Strong team
                 home.AddAGoalie(false);
             }
