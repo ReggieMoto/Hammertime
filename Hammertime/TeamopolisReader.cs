@@ -287,15 +287,38 @@ namespace Hammertime
 
                     if (_teamopolisSurveyUrl != null)   // Did we find the survey URL?
                         TeamopolisSurveyResponders();   // If so, go build a list of responders
-
-                    // Now that we have the list locally, in memory, write it to a local file
-                    AvailablePlayerFileIO.Instance.WriteAvailablePlayers(_teamopolisAvailablePlayers);
                 }
                 catch (WebException ex)
                 {
                     Console.WriteLine($"Error opening Teamopolis URL: {ex.Message}");
                 }
             }
+
+            // Randomize the list of players
+            Random randomizer = new Random();
+            ArrayList orderedListOfPlayers = new ArrayList();
+            ArrayList randomizedListOfPlayers = new ArrayList();
+            int count = _teamopolisAvailablePlayers.Count-1;
+
+            foreach (string player in _teamopolisAvailablePlayers)
+                orderedListOfPlayers.Add(player);
+
+            do
+            {
+                int randomValue = randomizer.Next(count);
+                //Console.WriteLine($"count: {count} randomValue: {randomValue}");
+                randomizedListOfPlayers.Add(orderedListOfPlayers[randomValue]);
+                orderedListOfPlayers.RemoveAt(randomValue);
+            } while (--count >= 0);
+
+            _teamopolisAvailablePlayers.Clear();
+            foreach (string player in randomizedListOfPlayers)
+            {
+                _teamopolisAvailablePlayers.Add(player);
+            }
+
+            // Now that we have the list locally, in memory, write it to a local file
+            AvailablePlayerFileIO.Instance.WriteAvailablePlayers(_teamopolisAvailablePlayers);
         }
     }
 }
