@@ -398,6 +398,7 @@ namespace Hammertime
             if (runaway >= 5)
                 Console.WriteLine("Runaway halted.");
 
+            Console.WriteLine("Select goalies.");
             if (home.TeamScore >= visitor.TeamScore)
             {
                 home.AddAGoalie(true); // Strong team

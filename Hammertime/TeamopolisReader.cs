@@ -268,6 +268,7 @@ namespace Hammertime
             {
                 try
                 {
+                    Console.WriteLine("Reading players from file.");
                     _teamopolisAvailablePlayers = AvailablePlayerFileIO.Instance.ReadAvailablePlayers();
                 }
                 catch (AvailablePlayerFileIOException ex)
