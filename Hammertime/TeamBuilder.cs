@@ -133,12 +133,18 @@ namespace Hammertime
                 }
                 else if (player.AltCaptain == true)
                 {
-                    if (player.PlayerLastWeek == "White")
+                    if ((player.PlayerLastWeek == "White") &&
+                        (home.PlayerCount < away.PlayerCount))
                         home.AddAPlayer(player);
-                    else if (player.PlayerLastWeek == "Black")
+                    else if ((player.PlayerLastWeek == "Black") &&
+                        (away.PlayerCount < home.PlayerCount))
                         away.AddAPlayer(player);
                     else
                     {
+                        if (home.PlayerCount < away.PlayerCount)
+                            home.AddAPlayer(player);
+                        else
+                            away.AddAPlayer(player);
                     }
                 }
                 else // Players not captains or alt-captains
@@ -208,16 +214,16 @@ namespace Hammertime
                 TeamAssign(player);
 
             query = from player in _availableFullTimePlayers
-                    where player.AltCaptain == true         // Alt Captain
-                    where player.PlayerLastWeek != "Zed"    // Alt Captain is either black or white
+                    where player.Captain == true            // Captain
+                    where player.PlayerLastWeek == "Zed"    // Captain is neither black nor white
                     select player;
 
             foreach (var player in query)
                 TeamAssign(player);
 
             query = from player in _availableFullTimePlayers
-                    where player.Captain == true            // Captain
-                    where player.PlayerLastWeek == "Zed"    // Captain is neither black nor white
+                    where player.AltCaptain == true         // Alt Captain
+                    where player.PlayerLastWeek != "Zed"    // Alt Captain is either black or white
                     select player;
 
             foreach (var player in query)
