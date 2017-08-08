@@ -131,17 +131,19 @@ namespace Hammertime
                     {
                     }
                 }
-                else if (player.AltCaptain == true)
+                else if ((player.AltCaptain == true) &&
+                    ((home.PlayerCount < 1) ||
+                    (away.PlayerCount < 1)))
                 {
                     if ((player.PlayerLastWeek == "White") &&
-                        (home.PlayerCount < away.PlayerCount))
+                        (home.PlayerCount < 1))
                         home.AddAPlayer(player);
                     else if ((player.PlayerLastWeek == "Black") &&
-                        (away.PlayerCount < home.PlayerCount))
+                        (away.PlayerCount < 1))
                         away.AddAPlayer(player);
                     else
                     {
-                        if (home.PlayerCount < away.PlayerCount)
+                        if (home.PlayerCount < 1)
                             home.AddAPlayer(player);
                         else
                             away.AddAPlayer(player);
@@ -152,17 +154,26 @@ namespace Hammertime
                     int[] homeTeamComp = home.TeamComposition;
                     int[] awayTeamComp = away.TeamComposition;
                     bool assignHome = false;
+                    int scoreDifferential = 0;
 
+                    if (home.TeamScore <= away.TeamScore)
+                        scoreDifferential = away.TeamScore - home.TeamScore;
+                    else
+                        scoreDifferential = home.TeamScore - away.TeamScore;
+                    
                     switch (player.Level)
                     {
                         case HockeyPlayer.PlayerSkill.Level_A:
                             if ((home.PlayerCount < away.PlayerCount) &&
-                                (homeTeamComp[0] < awayTeamComp[0]))
+                                (home.TeamScore <= away.TeamScore) &&
+                                (homeTeamComp[0] <= awayTeamComp[0]))
                                 assignHome = true;
+
                             break;
 
                         case HockeyPlayer.PlayerSkill.Level_B:
                             if ((home.PlayerCount <= away.PlayerCount) &&
+                                (home.TeamScore <= away.TeamScore) &&
                                 ((homeTeamComp[0] <= awayTeamComp[0]) ||
                                 (homeTeamComp[1] <= awayTeamComp[1])))
                                 assignHome = true;
@@ -170,6 +181,7 @@ namespace Hammertime
 
                         case HockeyPlayer.PlayerSkill.Level_C:
                             if ((home.PlayerCount <= away.PlayerCount) &&
+                                (home.TeamScore <= away.TeamScore) &&
                                 ((homeTeamComp[0] <= awayTeamComp[0]) ||
                                 (homeTeamComp[1] <= awayTeamComp[1]) ||
                                 (homeTeamComp[2] <= awayTeamComp[2])))
@@ -182,6 +194,7 @@ namespace Hammertime
                                 (home.TeamScore < away.TeamScore))
                                 */
                             if ((home.PlayerCount <= away.PlayerCount) &&
+                                (home.TeamScore <= away.TeamScore) &&
                                 ((homeTeamComp[0] <= awayTeamComp[0]) ||
                                 (homeTeamComp[1] <= awayTeamComp[1]) ||
                                 (homeTeamComp[2] <= awayTeamComp[2]) ||

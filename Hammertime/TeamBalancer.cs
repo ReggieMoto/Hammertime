@@ -251,24 +251,24 @@ namespace Hammertime
                         break;
 
                     case 2: // Swap an A for a C or a B for a D
-                        Console.WriteLine("BalanceDifferential5/4: Try to swap an A with a C");
-                        strongPlayer = strongTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
-                        weakPlayer = weakTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
+                        Console.WriteLine("BalanceDifferential5/4: Try to swap a B with a D");
+                        strongPlayer = strongTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
+                        weakPlayer = weakTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
 
                         if (strongPlayer == null || weakPlayer == null)
                         {
-                            // If we can't do that try to swap a B (3) with a D (1)
-                            Console.WriteLine("BalanceDifferential5/4: Try to swap a B with a D");
-                            strongPlayer = strongTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
-                            weakPlayer = weakTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
+                            // If we can't do that try to swap an A (4) with a C (2)
+                            Console.WriteLine("BalanceDifferential5/4: Try to swap an A with a C");
+                            strongPlayer = strongTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
+                            weakPlayer = weakTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
                         }
                         break;
 
                     case 1:  // Swap an A for a B, a B for a C,  or a C for a D
                                 // Try to swap an A with a B
-                        Console.WriteLine("BalanceDifferential3/2: Try to swap an A with a B");
-                        strongPlayer = strongTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
-                        weakPlayer = weakTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
+                        Console.WriteLine("BalanceDifferential3/2: Try to swap a C with a D");
+                        strongPlayer = strongTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
+                        weakPlayer = weakTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
 
                         if (strongPlayer == null || weakPlayer == null)
                         {
@@ -281,9 +281,9 @@ namespace Hammertime
                         if (strongPlayer == null || weakPlayer == null)
                         {
                             // If we can't do that try to swap a C with a D
-                            Console.WriteLine("BalanceDifferential3/2: Try to swap a C with a D");
-                            strongPlayer = strongTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
-                            weakPlayer = weakTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
+                            Console.WriteLine("BalanceDifferential3/2: Try to swap an A with a B");
+                            strongPlayer = strongTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_A);
+                            weakPlayer = weakTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_B);
                         }
                         break;
                 }
@@ -348,6 +348,11 @@ namespace Hammertime
                     case 1:
                         Console.WriteLine("BalanceDifferential3/2: Try to move a D player from strong to weak");
                         player = strongTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_D);
+                        if (player == null)
+                        {
+                            Console.WriteLine("BalanceDifferential3/2: FAIL: Try to move a C player from strong to weak");
+                            player = strongTeam.GetASkillPlayer(HockeyPlayer.PlayerSkill.Level_C);
+                        }
                         break;
                 }
 
