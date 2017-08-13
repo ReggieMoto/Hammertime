@@ -164,7 +164,7 @@ namespace Hammertime
                     switch (player.Level)
                     {
                         case HockeyPlayer.PlayerSkill.Level_A:
-                            if ((home.PlayerCount < away.PlayerCount) &&
+                            if ((home.PlayerCount <= away.PlayerCount) &&
                                 (home.TeamScore <= away.TeamScore) &&
                                 (homeTeamComp[0] <= awayTeamComp[0]))
                                 assignHome = true;
